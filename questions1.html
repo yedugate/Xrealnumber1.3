@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interactive 150 Questions — Euclid’s Division Lemma</title>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+:root {
+  --blue:#155eaa;
+  --dark:#0f315d;
+  --soft:#edf6ff;
+  --gold:#f2b705;
+  --green:#168057;
+  --orange:#d97706;
+  --red:#b91c1c;
+  --ink:#172033;
+  --muted:#5b6475;
+  --border:#d8e5f2;
+  --paper:#ffffff;
+  --correct:#eafaf2;
+  --wrong:#fff0f0;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  font-family:"Segoe UI", Arial, sans-serif;
+  color:var(--ink);
+  line-height:1.55;
+  background:
+    radial-gradient(circle at top left, rgba(21,94,170,.16), transparent 34rem),
+    linear-gradient(180deg,#f7fbff,#eef5fc);
+}
+
+.app {
+  max-width:1180px;
+  margin:28px auto;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:26px;
+  box-shadow:0 18px 50px rgba(15,49,93,.13);
+  overflow:hidden;
+}
+
+.hero {
+  padding:34px 44px 30px;
+  color:white;
+  background:linear-gradient(135deg,var(--blue),var(--dark));
+  position:relative;
+}
+
+.hero:after {
+  content:"150";
+  position:absolute;
+  right:36px;
+  bottom:-22px;
+  font-size:124px;
+  font-weight:900;
+  opacity:.13;
+}
+
+.hero h1 {
+  margin:0;
+  font-size:38px;
+  line-height:1.08;
+}
+
+.hero p {
+  margin:10px 0 0;
+  color:#dcecff;
+  font-size:18px;
+}
+
+.topbar {
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(255,255,255,.94);
+  border-bottom:1px solid var(--border);
+  backdrop-filter: blur(9px);
+  padding:14px 22px;
+}
+
+.controls {
+  display:grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  gap:10px;
+  align-items:center;
+}
+
+input[type="search"], select {
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:10px 14px;
+  font-size:15px;
+  background:white;
+}
+
+button {
+  border:0;
+  border-radius:999px;
+  padding:10px 16px;
+  font-weight:800;
+  cursor:pointer;
+  background:var(--blue);
+  color:white;
+  box-shadow:0 8px 20px rgba(21,94,170,.20);
+}
+
+button.secondary {
+  background:#eef4fb;
+  color:var(--dark);
+  box-shadow:none;
+  border:1px solid var(--border);
+}
+
+button.danger {
+  background:#b91c1c;
+}
+
+.stats {
+  margin-top:12px;
+  display:grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap:10px;
+}
+
+.stat {
+  background:#f8fbff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:10px 12px;
+  text-align:center;
+}
+
+.stat strong {
+  display:block;
+  font-size:22px;
+  color:var(--dark);
+}
+
+.progress-wrap {
+  margin-top:12px;
+  height:12px;
+  border-radius:999px;
+  background:#e8eef7;
+  overflow:hidden;
+}
+
+.progress-bar {
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--green),var(--gold));
+  transition:.35s width ease;
+}
+
+main {
+  padding:30px 44px 46px;
+}
+
+.level-title {
+  margin:34px 0 18px;
+  color:var(--dark);
+  font-size:26px;
+  border-left:6px solid var(--gold);
+  padding-left:14px;
+}
+
+.qcard {
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:18px;
+  margin:16px 0;
+  background:white;
+  break-inside:avoid;
+  page-break-inside:avoid;
+}
+
+.qcard.basic { border-left:8px solid var(--green); }
+.qcard.intermediate { border-left:8px solid var(--orange); }
+.qcard.advanced { border-left:8px solid var(--red); }
+
+.qmeta {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.badge {
+  font-size:12px;
+  font-weight:900;
+  padding:4px 10px;
+  border-radius:999px;
+  background:var(--soft);
+  color:var(--dark);
+}
+
+.badge.basic { background:#eafaf2; color:#11633f; }
+.badge.intermediate { background:#fff4e4; color:#92400e; }
+.badge.advanced { background:#fff0f0; color:#991b1b; }
+
+.qtext {
+  font-size:17px;
+  font-weight:750;
+  margin:10px 0 14px;
+}
+
+.option {
+  width:100%;
+  display:block;
+  text-align:left;
+  padding:11px 13px;
+  margin:8px 0;
+  border-radius:14px;
+  background:#f8fbff;
+  border:1px solid var(--border);
+  color:var(--ink);
+  box-shadow:none;
+  font-weight:650;
+}
+
+.option:hover {
+  background:#edf6ff;
+}
+
+.option.selected {
+  border-color:var(--blue);
+  background:#eaf4ff;
+}
+
+.option.correct {
+  background:var(--correct);
+  border-color:#88d7ad;
+}
+
+.option.wrong {
+  background:var(--wrong);
+  border-color:#f0a0a0;
+}
+
+.fill-row {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+}
+
+.fill-row input {
+  flex:1;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:11px 13px;
+  font-size:15px;
+}
+
+.answer {
+  margin-top:12px;
+  padding:11px 13px;
+  border-radius:14px;
+  background:#eefaf5;
+  color:#124c36;
+  border:1px solid #b9e8d4;
+  display:none;
+}
+
+.answer.show {
+  display:block;
+}
+
+.feedback {
+  margin-top:10px;
+  font-weight:900;
+}
+
+.feedback.correct { color:var(--green); }
+.feedback.wrong { color:var(--red); }
+
+.matchgrid {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:16px;
+  margin:12px 0;
+}
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin:8px 0;
+}
+
+th {
+  background:var(--blue);
+  color:white;
+  text-align:left;
+  padding:9px;
+}
+
+td {
+  border:1px solid var(--border);
+  padding:8px;
+  vertical-align:top;
+}
+
+tr:nth-child(even) td {
+  background:#f8fbff;
+}
+
+.match-select-row {
+  display:grid;
+  grid-template-columns: 1fr 190px;
+  gap:10px;
+  align-items:center;
+  margin:8px 0;
+}
+
+.match-select-row select {
+  border-radius:14px;
+  width:100%;
+}
+
+.hidden {
+  display:none !important;
+}
+
+.reward-panel {
+  margin-top:38px;
+  padding:26px;
+  border-radius:24px;
+  background:linear-gradient(135deg,#fff8db,#eefaf5);
+  border:2px solid #f0df9e;
+}
+
+.reward-panel h2 {
+  margin-top:0;
+  color:var(--dark);
+}
+
+.reward-title {
+  font-size:26px;
+  font-weight:900;
+  color:var(--dark);
+  margin:8px 0;
+}
+
+.badges-row {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:16px 0;
+}
+
+.badges-row span {
+  display:inline-block;
+  padding:10px 14px;
+  border-radius:999px;
+  background:white;
+  border:1px solid #d9c772;
+  font-weight:850;
+}
+
+.footer {
+  padding:18px 44px;
+  background:#f8fbff;
+  border-top:1px solid var(--border);
+  color:var(--muted);
+  text-align:center;
+}
+
+.MathJax, mjx-container {
+  font-size:105% !important;
+}
+
+@media(max-width:900px) {
+  .controls {
+    grid-template-columns:1fr 1fr;
+  }
+  .stats {
+    grid-template-columns:repeat(2,1fr);
+  }
+  .matchgrid {
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:650px) {
+  .app { margin:8px; border-radius:18px; }
+  .hero, main, .footer { padding-left:20px; padding-right:20px; }
+  .hero h1 { font-size:29px; }
+  .controls { grid-template-columns:1fr; }
+  .stats { grid-template-columns:1fr; }
+  .fill-row { flex-direction:column; align-items:stretch; }
+  .match-select-row { grid-template-columns:1fr; }
+}
+
+@media print {
+  @page { size:A4; margin:11mm; }
+  body { background:white; font-size:10.5pt; }
+  .app { margin:0; max-width:100%; border:0; border-radius:0; box-shadow:none; }
+  .topbar { display:none; }
+  .hero {
+    background:white !important;
+    color:#0f315d;
+    padding:0 0 12px;
+    border-bottom:2px solid #0f315d;
+  }
+  .hero p { color:#333; }
+  .hero:after { display:none; }
+  main { padding:16px 0; }
+  .qcard {
+    padding:10px 12px;
+    margin:8px 0;
+    border-radius:10px;
+  }
+  .answer { display:block !important; }
+  button, input, select { display:none !important; }
+  th { background:#e8eef7 !important; color:#111; }
+  .footer { padding:8px 0 0; background:white; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <header class="hero">
+    <h1>Interactive 150 Questions on Euclid’s Division Lemma</h1>
+    <p>50 MCQs • 50 Fill in the Blanks • 50 Match the Following | Basic • Intermediate • Advanced</p>
+  </header>
+
+  <section class="topbar">
+    <div class="controls">
+      <input id="searchBox" type="search" placeholder="Search questions, e.g., remainder, HCF, 58..." />
+      <select id="typeFilter">
+        <option value="All">All Types</option>
+        <option value="MCQ">MCQ</option>
+        <option value="Fill">Fill in the Blanks</option>
+        <option value="Match">Match the Following</option>
+      </select>
+      <select id="levelFilter">
+        <option value="All">All Levels</option>
+        <option value="Basic">Basic</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Advanced">Advanced</option>
+      </select>
+      <button class="secondary" onclick="showAllAnswers()">Show All Answers</button>
+      <button class="danger" onclick="resetQuiz()">Reset</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><strong id="score">0</strong>Score</div>
+      <div class="stat"><strong id="attempted">0</strong>Attempted</div>
+      <div class="stat"><strong id="correct">0</strong>Correct</div>
+      <div class="stat"><strong id="remaining">150</strong>Remaining</div>
+      <div class="stat"><strong id="rewardMini">Starter</strong>Level</div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </section>
+
+  <main>
+    <p><strong>Main formula:</strong> $a = bq + r$, where $0 \leq r < b$.</p>
+    <p>Each question gives immediate checking and also shows the answer after the question.</p>
+    <div id="questionContainer"></div>
+
+    <section class="reward-panel" id="rewardPanel">
+      <h2>Final Student Reward System</h2>
+      <p>Your reward updates automatically based on your score.</p>
+      <div class="reward-title" id="rewardTitle">Starter Learner</div>
+      <p id="rewardMessage">You have started the journey. Revise the formula and try again.</p>
+      <div class="badges-row">
+        <span>⭐ Formula Star</span>
+        <span>🏅 Remainder Ranger</span>
+        <span>🎯 HCF Hero</span>
+        <span>👑 Euclid Legend</span>
+      </div>
+      <table>
+        <thead><tr><th>Score</th><th>Level Title</th><th>Reward / Motivation</th></tr></thead>
+        <tbody>
+          <tr><td>0–30</td><td>Starter Learner</td><td>Revise the formula $a = bq + r$ and try again.</td></tr>
+          <tr><td>31–60</td><td>Concept Builder</td><td>Good effort. Practice remainder conditions daily.</td></tr>
+          <tr><td>61–90</td><td>Division Explorer</td><td>Great progress. You can solve many textbook-type questions.</td></tr>
+          <tr><td>91–120</td><td>Euclid Champion</td><td>Excellent. You understand basic and intermediate applications clearly.</td></tr>
+          <tr><td>121–145</td><td>Math Master</td><td>Outstanding. You are ready for advanced proofs and HCF problems.</td></tr>
+          <tr><td>146–150</td><td>Euclid Legend</td><td>Superb! You have mastered the lesson. Teach one friend and earn a bonus star.</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Bonus challenge:</strong> After scoring above 120, create 5 new questions using Euclid’s Division Lemma.</p>
+    </section>
+  </main>
+
+  <footer class="footer">Class 9 CBSE Mathematics — Real Numbers | Interactive worksheet</footer>
+</div>
+
+<script>
+const QUESTIONS = [{"type": "MCQ", "num": 1, "level": "Basic", "question": "What is the standard form of Euclid’s Division Lemma?", "options": [{"letter": "A", "text": "a = bq + r"}, {"letter": "B", "text": "b = aq + r"}, {"letter": "C", "text": "q = ab + r"}, {"letter": "D", "text": "r = aq + b"}], "answer": "A", "reason": "The correct form is a = bq + r."}, {"type": "MCQ", "num": 2, "level": "Basic", "question": "In a = bq + r, what does a represent?", "options": [{"letter": "A", "text": "Divisor"}, {"letter": "B", "text": "Dividend"}, {"letter": "C", "text": "Quotient"}, {"letter": "D", "text": "Remainder"}], "answer": "B", "reason": "a is the number being divided."}, {"type": "MCQ", "num": 3, "level": "Basic", "question": "In a = bq + r, what does b represent?", "options": [{"letter": "A", "text": "Dividend"}, {"letter": "B", "text": "Remainder"}, {"letter": "C", "text": "Divisor"}, {"letter": "D", "text": "Quotient"}], "answer": "C", "reason": "b is the number by which we divide."}, {"type": "MCQ", "num": 4, "level": "Basic", "question": "In a = bq + r, what does q represent?", "options": [{"letter": "A", "text": "Quotient"}, {"letter": "B", "text": "Divisor"}, {"letter": "C", "text": "Dividend"}, {"letter": "D", "text": "Remainder"}], "answer": "A", "reason": "q is the quotient."}, {"type": "MCQ", "num": 5, "level": "Basic", "question": "In a = bq + r, what does r represent?", "options": [{"letter": "A", "text": "Quotient"}, {"letter": "B", "text": "Remainder"}, {"letter": "C", "text": "Dividend"}, {"letter": "D", "text": "Divisor"}], "answer": "B", "reason": "r is the remainder."}, {"type": "MCQ", "num": 6, "level": "Basic", "question": "What is the condition for the remainder r?", "options": [{"letter": "A", "text": "r > b"}, {"letter": "B", "text": "r = b"}, {"letter": "C", "text": "0 ≤ r < b"}, {"letter": "D", "text": "r < 0"}], "answer": "C", "reason": "The remainder must be non-negative and smaller than the divisor."}, {"type": "MCQ", "num": 7, "level": "Basic", "question": "For 58 = 9 × 6 + 4, what is the quotient?", "options": [{"letter": "A", "text": "4"}, {"letter": "B", "text": "6"}, {"letter": "C", "text": "9"}, {"letter": "D", "text": "58"}], "answer": "B", "reason": "The quotient is 6."}, {"type": "MCQ", "num": 8, "level": "Basic", "question": "For 58 = 9 × 6 + 4, what is the remainder?", "options": [{"letter": "A", "text": "4"}, {"letter": "B", "text": "6"}, {"letter": "C", "text": "9"}, {"letter": "D", "text": "58"}], "answer": "A", "reason": "The remainder is 4."}, {"type": "MCQ", "num": 9, "level": "Basic", "question": "For 25 = 7 × 3 + 4, what is the divisor?", "options": [{"letter": "A", "text": "25"}, {"letter": "B", "text": "7"}, {"letter": "C", "text": "3"}, {"letter": "D", "text": "4"}], "answer": "B", "reason": "The divisor is 7."}, {"type": "MCQ", "num": 10, "level": "Basic", "question": "For 25 = 7 × 3 + 4, what is the dividend?", "options": [{"letter": "A", "text": "25"}, {"letter": "B", "text": "7"}, {"letter": "C", "text": "3"}, {"letter": "D", "text": "4"}], "answer": "A", "reason": "The dividend is 25."}, {"type": "MCQ", "num": 11, "level": "Basic", "question": "Which value can be a remainder when dividing by 5?", "options": [{"letter": "A", "text": "5"}, {"letter": "B", "text": "6"}, {"letter": "C", "text": "4"}, {"letter": "D", "text": "8"}], "answer": "C", "reason": "Remainders must be 0, 1, 2, 3, or 4."}, {"type": "MCQ", "num": 12, "level": "Basic", "question": "Which value cannot be a remainder when dividing by 7?", "options": [{"letter": "A", "text": "0"}, {"letter": "B", "text": "3"}, {"letter": "C", "text": "6"}, {"letter": "D", "text": "7"}], "answer": "D", "reason": "The remainder must be less than 7."}, {"type": "MCQ", "num": 13, "level": "Basic", "question": "If 35 = 5 × 7 + 0, the remainder is:", "options": [{"letter": "A", "text": "0"}, {"letter": "B", "text": "5"}, {"letter": "C", "text": "7"}, {"letter": "D", "text": "35"}], "answer": "A", "reason": "The remainder is 0."}, {"type": "MCQ", "num": 14, "level": "Basic", "question": "If the remainder is 0, the number is:", "options": [{"letter": "A", "text": "not divisible"}, {"letter": "B", "text": "exactly divisible"}, {"letter": "C", "text": "always odd"}, {"letter": "D", "text": "always prime"}], "answer": "B", "reason": "A zero remainder means exact divisibility."}, {"type": "MCQ", "num": 15, "level": "Basic", "question": "If 7 = 15 × 0 + 7, the quotient is:", "options": [{"letter": "A", "text": "15"}, {"letter": "B", "text": "7"}, {"letter": "C", "text": "0"}, {"letter": "D", "text": "1"}], "answer": "C", "reason": "Since 15 is bigger than 7, it goes 0 times."}, {"type": "MCQ", "num": 16, "level": "Basic", "question": "What does lemma mean in mathematics?", "options": [{"letter": "A", "text": "A guess"}, {"letter": "B", "text": "A diagram"}, {"letter": "C", "text": "A proven statement used to prove another result"}, {"letter": "D", "text": "A table"}], "answer": "C", "reason": "A lemma is a proved supporting result."}, {"type": "MCQ", "num": 17, "level": "Basic", "question": "Euclid’s Division Lemma belongs mainly to which chapter?", "options": [{"letter": "A", "text": "Real Numbers"}, {"letter": "B", "text": "Geometry"}, {"letter": "C", "text": "Statistics"}, {"letter": "D", "text": "Mensuration"}], "answer": "A", "reason": "In Class 9, it appears in Real Numbers."}, {"type": "MCQ", "num": 18, "level": "Intermediate", "question": "Which is the correct Euclid form for dividing 47 by 6?", "options": [{"letter": "A", "text": "47 = 6 × 6 + 11"}, {"letter": "B", "text": "47 = 6 × 7 + 5"}, {"letter": "C", "text": "47 = 7 × 6 + 5"}, {"letter": "D", "text": "6 = 47 × 0 + 6"}], "answer": "B", "reason": "6 × 7 = 42 and 47 − 42 = 5."}, {"type": "MCQ", "num": 19, "level": "Intermediate", "question": "Which is the correct Euclid form for dividing 81 by 9?", "options": [{"letter": "A", "text": "81 = 9 × 8 + 9"}, {"letter": "B", "text": "81 = 9 × 9 + 0"}, {"letter": "C", "text": "81 = 8 × 9 + 9"}, {"letter": "D", "text": "9 = 81 × 0 + 9"}], "answer": "B", "reason": "81 is exactly divisible by 9."}, {"type": "MCQ", "num": 20, "level": "Intermediate", "question": "Which is the correct Euclid form for dividing 100 by 13?", "options": [{"letter": "A", "text": "100 = 13 × 7 + 9"}, {"letter": "B", "text": "100 = 13 × 8 − 4"}, {"letter": "C", "text": "100 = 13 × 6 + 22"}, {"letter": "D", "text": "100 = 9 × 13 + 7"}], "answer": "A", "reason": "13 × 7 = 91 and the remainder is 9."}, {"type": "MCQ", "num": 21, "level": "Intermediate", "question": "What are the possible remainders when divided by 2?", "options": [{"letter": "A", "text": "0 only"}, {"letter": "B", "text": "0, 1"}, {"letter": "C", "text": "1, 2"}, {"letter": "D", "text": "0, 1, 2"}], "answer": "B", "reason": "Remainders are less than 2."}, {"type": "MCQ", "num": 22, "level": "Intermediate", "question": "What are the possible remainders when divided by 3?", "options": [{"letter": "A", "text": "0, 1"}, {"letter": "B", "text": "1, 2, 3"}, {"letter": "C", "text": "0, 1, 2"}, {"letter": "D", "text": "0, 1, 2, 3"}], "answer": "C", "reason": "Remainders are 0, 1, and 2."}, {"type": "MCQ", "num": 23, "level": "Intermediate", "question": "What are the possible remainders when divided by 4?", "options": [{"letter": "A", "text": "0, 1, 2"}, {"letter": "B", "text": "1, 2, 3, 4"}, {"letter": "C", "text": "0, 1, 2, 3"}, {"letter": "D", "text": "0, 2, 4"}], "answer": "C", "reason": "Remainders are less than 4."}, {"type": "MCQ", "num": 24, "level": "Intermediate", "question": "Every positive integer divided by 3 can be written as:", "options": [{"letter": "A", "text": "3q only"}, {"letter": "B", "text": "3q or 3q+1"}, {"letter": "C", "text": "3q, 3q+1, or 3q+2"}, {"letter": "D", "text": "3q+3 only"}], "answer": "C", "reason": "The possible remainders are 0, 1, and 2."}, {"type": "MCQ", "num": 25, "level": "Intermediate", "question": "Every positive integer divided by 2 is of the form:", "options": [{"letter": "A", "text": "2q or 2q+1"}, {"letter": "B", "text": "2q or 2q+2"}, {"letter": "C", "text": "q or q+1"}, {"letter": "D", "text": "2q+3 only"}], "answer": "A", "reason": "These are the even and odd forms."}, {"type": "MCQ", "num": 26, "level": "Intermediate", "question": "Which form represents an even number?", "options": [{"letter": "A", "text": "2q"}, {"letter": "B", "text": "2q+1"}, {"letter": "C", "text": "3q+1"}, {"letter": "D", "text": "4q+3"}], "answer": "A", "reason": "Even numbers have remainder 0 when divided by 2."}, {"type": "MCQ", "num": 27, "level": "Intermediate", "question": "Which form represents an odd number?", "options": [{"letter": "A", "text": "2q"}, {"letter": "B", "text": "2q+1"}, {"letter": "C", "text": "4q"}, {"letter": "D", "text": "6q"}], "answer": "B", "reason": "Odd numbers have remainder 1 when divided by 2."}, {"type": "MCQ", "num": 28, "level": "Intermediate", "question": "Which expression is not valid as Euclid form?", "options": [{"letter": "A", "text": "20 = 3 × 6 + 2"}, {"letter": "B", "text": "35 = 5 × 7 + 0"}, {"letter": "C", "text": "25 = 7 × 2 + 11"}, {"letter": "D", "text": "7 = 15 × 0 + 7"}], "answer": "C", "reason": "The remainder 11 is greater than divisor 7."}, {"type": "MCQ", "num": 29, "level": "Intermediate", "question": "For 103 = 8 × 12 + 7, q and r are:", "options": [{"letter": "A", "text": "q=8, r=7"}, {"letter": "B", "text": "q=12, r=7"}, {"letter": "C", "text": "q=7, r=12"}, {"letter": "D", "text": "q=103, r=8"}], "answer": "B", "reason": "Quotient is 12 and remainder is 7."}, {"type": "MCQ", "num": 30, "level": "Intermediate", "question": "For 75 = 12 × 6 + 3, the remainder condition is:", "options": [{"letter": "A", "text": "0 ≤ 3 < 12"}, {"letter": "B", "text": "3 > 12"}, {"letter": "C", "text": "12 < 3"}, {"letter": "D", "text": "3 = 12"}], "answer": "A", "reason": "3 is non-negative and less than 12."}, {"type": "MCQ", "num": 31, "level": "Intermediate", "question": "If a number is divided by 6, possible remainders are:", "options": [{"letter": "A", "text": "0 to 5"}, {"letter": "B", "text": "1 to 6"}, {"letter": "C", "text": "0 to 6"}, {"letter": "D", "text": "2 to 6"}], "answer": "A", "reason": "Remainders are 0, 1, 2, 3, 4, and 5."}, {"type": "MCQ", "num": 32, "level": "Intermediate", "question": "If divisor is greater than dividend, the quotient is usually:", "options": [{"letter": "A", "text": "1"}, {"letter": "B", "text": "0"}, {"letter": "C", "text": "negative"}, {"letter": "D", "text": "equal to dividend"}], "answer": "B", "reason": "Example: 7 = 15 × 0 + 7."}, {"type": "MCQ", "num": 33, "level": "Intermediate", "question": "In 18 = 25 × 0 + 18, why is it valid?", "options": [{"letter": "A", "text": "18 > 25"}, {"letter": "B", "text": "0 ≤ 18 < 25"}, {"letter": "C", "text": "25 < 18"}, {"letter": "D", "text": "18 = 25"}], "answer": "B", "reason": "The remainder is smaller than the divisor."}, {"type": "MCQ", "num": 34, "level": "Intermediate", "question": "Which is the correct form for a number divided by 5?", "options": [{"letter": "A", "text": "5q, 5q+1, 5q+2, 5q+3, 5q+4"}, {"letter": "B", "text": "5q only"}, {"letter": "C", "text": "5q+5"}, {"letter": "D", "text": "q+5"}], "answer": "A", "reason": "The possible remainders are 0 to 4."}, {"type": "MCQ", "num": 35, "level": "Advanced", "question": "What does uniqueness mean in Euclid’s Division Lemma?", "options": [{"letter": "A", "text": "Many quotients are possible"}, {"letter": "B", "text": "Only one valid quotient and remainder exist"}, {"letter": "C", "text": "No remainder exists"}, {"letter": "D", "text": "Only one divisor exists"}], "answer": "B", "reason": "For fixed a and b, q and r are unique."}, {"type": "MCQ", "num": 36, "level": "Advanced", "question": "Which representation is valid for 58 divided by 9?", "options": [{"letter": "A", "text": "58 = 9 × 5 + 13"}, {"letter": "B", "text": "58 = 9 × 7 − 5"}, {"letter": "C", "text": "58 = 9 × 6 + 4"}, {"letter": "D", "text": "58 = 6 × 9 + 4"}], "answer": "C", "reason": "The valid remainder is 4 because 0 ≤ 4 < 9."}, {"type": "MCQ", "num": 37, "level": "Advanced", "question": "Why is 58 = 9 × 5 + 13 invalid as Euclid form?", "options": [{"letter": "A", "text": "It is not equal to 58"}, {"letter": "B", "text": "13 is greater than 9"}, {"letter": "C", "text": "5 is smaller than 9"}, {"letter": "D", "text": "9 is prime"}], "answer": "B", "reason": "The remainder must be less than the divisor."}, {"type": "MCQ", "num": 38, "level": "Advanced", "question": "Why is 58 = 9 × 7 − 5 invalid as Euclid form?", "options": [{"letter": "A", "text": "The quotient is too high"}, {"letter": "B", "text": "The remainder is negative"}, {"letter": "C", "text": "The divisor is not positive"}, {"letter": "D", "text": "The dividend is not positive"}], "answer": "B", "reason": "Remainder cannot be negative."}, {"type": "MCQ", "num": 39, "level": "Advanced", "question": "The multiples ..., −3b, −2b, −b, 0, b, 2b, 3b, ... form:", "options": [{"letter": "A", "text": "Geometric progression"}, {"letter": "B", "text": "Arithmetic progression"}, {"letter": "C", "text": "Fraction series"}, {"letter": "D", "text": "Prime series"}], "answer": "B", "reason": "The common difference is b."}, {"type": "MCQ", "num": 40, "level": "Advanced", "question": "In the proof idea, bq is chosen as:", "options": [{"letter": "A", "text": "smallest multiple of b greater than a"}, {"letter": "B", "text": "largest multiple of b not exceeding a"}, {"letter": "C", "text": "remainder"}, {"letter": "D", "text": "dividend"}], "answer": "B", "reason": "Then r = a − bq."}, {"type": "MCQ", "num": 41, "level": "Advanced", "question": "If r − t = b(s − q), then r − t is:", "options": [{"letter": "A", "text": "a prime number"}, {"letter": "B", "text": "a multiple of b"}, {"letter": "C", "text": "always negative"}, {"letter": "D", "text": "equal to a"}], "answer": "B", "reason": "It is b multiplied by an integer."}, {"type": "MCQ", "num": 42, "level": "Advanced", "question": "In uniqueness proof, if r − t = 0, then:", "options": [{"letter": "A", "text": "r = t"}, {"letter": "B", "text": "r > t"}, {"letter": "C", "text": "r < t"}, {"letter": "D", "text": "q = 0"}], "answer": "A", "reason": "r − t = 0 implies r = t."}, {"type": "MCQ", "num": 43, "level": "Advanced", "question": "The square of every odd integer is of the form:", "options": [{"letter": "A", "text": "4q"}, {"letter": "B", "text": "4q+1"}, {"letter": "C", "text": "4q+2"}, {"letter": "D", "text": "4q+3"}], "answer": "B", "reason": "(2m+1)^2 = 4(m²+m)+1."}, {"type": "MCQ", "num": 44, "level": "Advanced", "question": "Any odd integer can be written as:", "options": [{"letter": "A", "text": "2m"}, {"letter": "B", "text": "2m+1"}, {"letter": "C", "text": "3m"}, {"letter": "D", "text": "4m"}], "answer": "B", "reason": "Odd numbers have the form 2m+1."}, {"type": "MCQ", "num": 45, "level": "Advanced", "question": "The square of any integer is of the form:", "options": [{"letter": "A", "text": "3q or 3q+1"}, {"letter": "B", "text": "3q+2 only"}, {"letter": "C", "text": "4q+2 only"}, {"letter": "D", "text": "5q+5 only"}], "answer": "A", "reason": "Using remainders 0, 1, and 2 when divided by 3."}, {"type": "MCQ", "num": 46, "level": "Advanced", "question": "Euclid’s Division Algorithm is mainly used to find:", "options": [{"letter": "A", "text": "LCM only"}, {"letter": "B", "text": "HCF"}, {"letter": "C", "text": "area"}, {"letter": "D", "text": "perimeter"}], "answer": "B", "reason": "It is used to find the HCF."}, {"type": "MCQ", "num": 47, "level": "Advanced", "question": "In the HCF example, 225 = 135 × 1 + 90. Next step is:", "options": [{"letter": "A", "text": "135 = 90 × 1 + 45"}, {"letter": "B", "text": "90 = 135 × 1 + 45"}, {"letter": "C", "text": "225 = 90 × 2 + 45"}, {"letter": "D", "text": "45 = 90 × 0 + 45"}], "answer": "A", "reason": "Now divide the previous divisor by the previous remainder."}, {"type": "MCQ", "num": 48, "level": "Advanced", "question": "In Euclid’s algorithm, when does the process stop?", "options": [{"letter": "A", "text": "when quotient becomes 1"}, {"letter": "B", "text": "when remainder becomes 0"}, {"letter": "C", "text": "when divisor becomes 0"}, {"letter": "D", "text": "when numbers become equal at first step"}], "answer": "B", "reason": "The last non-zero divisor is the HCF."}, {"type": "MCQ", "num": 49, "level": "Advanced", "question": "HCF of 225 and 135 using the given algorithm is:", "options": [{"letter": "A", "text": "90"}, {"letter": "B", "text": "45"}, {"letter": "C", "text": "135"}, {"letter": "D", "text": "225"}], "answer": "B", "reason": "The last non-zero divisor is 45."}, {"type": "MCQ", "num": 50, "level": "Advanced", "question": "If a number is of the form 4q+1, its remainder when divided by 4 is:", "options": [{"letter": "A", "text": "0"}, {"letter": "B", "text": "1"}, {"letter": "C", "text": "2"}, {"letter": "D", "text": "4"}], "answer": "B", "reason": "The remainder is 1."}, {"type": "Fill", "num": 51, "level": "Basic", "question": "Euclid’s Division Lemma is written as ________.", "answer": "$a = bq + r$", "reason": "This is the standard form."}, {"type": "Fill", "num": 52, "level": "Basic", "question": "In $a = bq + r$, $a$ is called the ________.", "answer": "dividend", "reason": ""}, {"type": "Fill", "num": 53, "level": "Basic", "question": "In $a = bq + r$, $b$ is called the ________.", "answer": "divisor", "reason": ""}, {"type": "Fill", "num": 54, "level": "Basic", "question": "In $a = bq + r$, $q$ is called the ________.", "answer": "quotient", "reason": ""}, {"type": "Fill", "num": 55, "level": "Basic", "question": "In $a = bq + r$, $r$ is called the ________.", "answer": "remainder", "reason": ""}, {"type": "Fill", "num": 56, "level": "Basic", "question": "The condition on the remainder is ________.", "answer": "$0 \\leq r < b$", "reason": ""}, {"type": "Fill", "num": 57, "level": "Basic", "question": "In $58 = 9 \\times 6 + 4$, the quotient is ________.", "answer": "6", "reason": ""}, {"type": "Fill", "num": 58, "level": "Basic", "question": "In $58 = 9 \\times 6 + 4$, the remainder is ________.", "answer": "4", "reason": ""}, {"type": "Fill", "num": 59, "level": "Basic", "question": "In $25 = 7 \\times 3 + 4$, the divisor is ________.", "answer": "7", "reason": ""}, {"type": "Fill", "num": 60, "level": "Basic", "question": "In $25 = 7 \\times 3 + 4$, the dividend is ________.", "answer": "25", "reason": ""}, {"type": "Fill", "num": 61, "level": "Basic", "question": "If a number is exactly divisible, the remainder is ________.", "answer": "0", "reason": ""}, {"type": "Fill", "num": 62, "level": "Basic", "question": "The word lemma means a ________ statement used to prove another result.", "answer": "proven", "reason": ""}, {"type": "Fill", "num": 63, "level": "Basic", "question": "Division means splitting a number into ________ groups.", "answer": "equal", "reason": ""}, {"type": "Fill", "num": 64, "level": "Basic", "question": "The remainder must be smaller than the ________.", "answer": "divisor", "reason": ""}, {"type": "Fill", "num": 65, "level": "Basic", "question": "In $35 = 5 \\times 7 + 0$, the remainder is ________.", "answer": "0", "reason": ""}, {"type": "Fill", "num": 66, "level": "Basic", "question": "In $7 = 15 \\times 0 + 7$, the quotient is ________.", "answer": "0", "reason": ""}, {"type": "Fill", "num": 67, "level": "Basic", "question": "In $7 = 15 \\times 0 + 7$, the remainder is ________.", "answer": "7", "reason": ""}, {"type": "Fill", "num": 68, "level": "Intermediate", "question": "When a number is divided by 2, possible remainders are ________.", "answer": "0 and 1", "reason": ""}, {"type": "Fill", "num": 69, "level": "Intermediate", "question": "Every even number can be written in the form ________.", "answer": "$2q$", "reason": ""}, {"type": "Fill", "num": 70, "level": "Intermediate", "question": "Every odd number can be written in the form ________.", "answer": "$2q+1$", "reason": ""}, {"type": "Fill", "num": 71, "level": "Intermediate", "question": "When a number is divided by 3, possible remainders are ________.", "answer": "0, 1, and 2", "reason": ""}, {"type": "Fill", "num": 72, "level": "Intermediate", "question": "Every positive integer divided by 3 can be written as ________.", "answer": "$3q,\\; 3q+1,\\; 3q+2$", "reason": ""}, {"type": "Fill", "num": 73, "level": "Intermediate", "question": "When a number is divided by 4, possible remainders are ________.", "answer": "0, 1, 2, and 3", "reason": ""}, {"type": "Fill", "num": 74, "level": "Intermediate", "question": "Every positive integer divided by 4 can be written as ________.", "answer": "$4q,\\;4q+1,\\;4q+2,\\;4q+3$", "reason": ""}, {"type": "Fill", "num": 75, "level": "Intermediate", "question": "$47 = 6 \\times 7 +$ ________.", "answer": "5", "reason": ""}, {"type": "Fill", "num": 76, "level": "Intermediate", "question": "$81 = 9 \\times 9 +$ ________.", "answer": "0", "reason": ""}, {"type": "Fill", "num": 77, "level": "Intermediate", "question": "$100 = 13 \\times 7 +$ ________.", "answer": "9", "reason": ""}, {"type": "Fill", "num": 78, "level": "Intermediate", "question": "$103 = 8 \\times 12 +$ ________.", "answer": "7", "reason": ""}, {"type": "Fill", "num": 79, "level": "Intermediate", "question": "$75 = 12 \\times 6 +$ ________.", "answer": "3", "reason": ""}, {"type": "Fill", "num": 80, "level": "Intermediate", "question": "When divided by 5, possible remainders are ________.", "answer": "0, 1, 2, 3, and 4", "reason": ""}, {"type": "Fill", "num": 81, "level": "Intermediate", "question": "When divided by 6, possible remainders are ________.", "answer": "0, 1, 2, 3, 4, and 5", "reason": ""}, {"type": "Fill", "num": 82, "level": "Intermediate", "question": "When divided by 7, possible remainders are ________.", "answer": "0, 1, 2, 3, 4, 5, and 6", "reason": ""}, {"type": "Fill", "num": 83, "level": "Intermediate", "question": "In $18 = 25 \\times 0 + 18$, the divisor is ________.", "answer": "25", "reason": ""}, {"type": "Fill", "num": 84, "level": "Intermediate", "question": "In $18 = 25 \\times 0 + 18$, the quotient is ________.", "answer": "0", "reason": ""}, {"type": "Fill", "num": 85, "level": "Advanced", "question": "The quotient and remainder in Euclid’s Division Lemma are ________.", "answer": "unique", "reason": ""}, {"type": "Fill", "num": 86, "level": "Advanced", "question": "In uniqueness proof, if $r - t = 0$, then $r =$ ________.", "answer": "$t$", "reason": ""}, {"type": "Fill", "num": 87, "level": "Advanced", "question": "In uniqueness proof, if $bq = bs$, then $q =$ ________.", "answer": "$s$", "reason": ""}, {"type": "Fill", "num": 88, "level": "Advanced", "question": "The multiples $\\ldots, -3b, -2b, -b, 0, b, 2b, 3b, \\ldots$ form an ________ progression.", "answer": "arithmetic", "reason": ""}, {"type": "Fill", "num": 89, "level": "Advanced", "question": "The common difference of the multiples of $b$ is ________.", "answer": "$b$", "reason": ""}, {"type": "Fill", "num": 90, "level": "Advanced", "question": "The largest multiple of $b$ not exceeding $a$ is written as ________.", "answer": "$bq$", "reason": ""}, {"type": "Fill", "num": 91, "level": "Advanced", "question": "The remainder can be written as $r =$ ________.", "answer": "$a - bq$", "reason": ""}, {"type": "Fill", "num": 92, "level": "Advanced", "question": "Any odd integer can be written as ________.", "answer": "$2m+1$", "reason": ""}, {"type": "Fill", "num": 93, "level": "Advanced", "question": "The square of every odd integer is of the form ________.", "answer": "$4q+1$", "reason": ""}, {"type": "Fill", "num": 94, "level": "Advanced", "question": "The square of any positive integer is of the form ________ or ________.", "answer": "$3q$; $3q+1$", "reason": ""}, {"type": "Fill", "num": 95, "level": "Advanced", "question": "Euclid’s Division Algorithm is used to find ________.", "answer": "HCF", "reason": ""}, {"type": "Fill", "num": 96, "level": "Advanced", "question": "In $225 = 135 \\times 1 + 90$, the remainder is ________.", "answer": "90", "reason": ""}, {"type": "Fill", "num": 97, "level": "Advanced", "question": "In $135 = 90 \\times 1 + 45$, the remainder is ________.", "answer": "45", "reason": ""}, {"type": "Fill", "num": 98, "level": "Advanced", "question": "In $90 = 45 \\times 2 + 0$, the HCF is ________.", "answer": "45", "reason": ""}, {"type": "Fill", "num": 99, "level": "Advanced", "question": "The Euclid algorithm stops when the remainder becomes ________.", "answer": "0", "reason": ""}, {"type": "Fill", "num": 100, "level": "Advanced", "question": "The last non-zero divisor is the ________.", "answer": "HCF", "reason": ""}, {"type": "Match", "num": 101, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "a"}, {"letter": "B", "text": "b"}, {"letter": "C", "text": "q"}, {"letter": "D", "text": "r"}], "right": [{"number": "1", "text": "Remainder"}, {"number": "2", "text": "Dividend"}, {"number": "3", "text": "Divisor"}, {"number": "4", "text": "Quotient"}], "answerMap": {"a": "Dividend", "b": "Divisor", "q": "Quotient", "r": "Remainder"}, "answerText": "a → Dividend; b → Divisor; q → Quotient; r → Remainder"}, {"type": "Match", "num": 102, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "58"}, {"letter": "B", "text": "9"}, {"letter": "C", "text": "6"}, {"letter": "D", "text": "4"}], "right": [{"number": "1", "text": "Quotient"}, {"number": "2", "text": "Dividend"}, {"number": "3", "text": "Remainder"}, {"number": "4", "text": "Divisor"}], "answerMap": {"58": "Dividend", "9": "Divisor", "6": "Quotient", "4": "Remainder"}, "answerText": "58 → Dividend; 9 → Divisor; 6 → Quotient; 4 → Remainder"}, {"type": "Match", "num": 103, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "25"}, {"letter": "B", "text": "7"}, {"letter": "C", "text": "3"}, {"letter": "D", "text": "4"}], "right": [{"number": "1", "text": "Remainder"}, {"number": "2", "text": "Quotient"}, {"number": "3", "text": "Dividend"}, {"number": "4", "text": "Divisor"}], "answerMap": {"25": "Dividend", "7": "Divisor", "3": "Quotient", "4": "Remainder"}, "answerText": "25 → Dividend; 7 → Divisor; 3 → Quotient; 4 → Remainder"}, {"type": "Match", "num": 104, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "35"}, {"letter": "B", "text": "5"}, {"letter": "C", "text": "7"}, {"letter": "D", "text": "0"}], "right": [{"number": "1", "text": "Remainder"}, {"number": "2", "text": "Divisor"}, {"number": "3", "text": "Dividend"}, {"number": "4", "text": "Quotient"}], "answerMap": {"35": "Dividend", "5": "Divisor", "7": "Quotient", "0": "Remainder"}, "answerText": "35 → Dividend; 5 → Divisor; 7 → Quotient; 0 → Remainder"}, {"type": "Match", "num": 105, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Dividend"}, {"letter": "B", "text": "Divisor"}, {"letter": "C", "text": "Quotient"}, {"letter": "D", "text": "Remainder"}], "right": [{"number": "1", "text": "Leftover"}, {"number": "2", "text": "Number being divided"}, {"number": "3", "text": "Number by which we divide"}, {"number": "4", "text": "Number of full groups"}], "answerMap": {"Dividend": "Number being divided", "Divisor": "Number by which we divide", "Quotient": "Number of full groups", "Remainder": "Leftover"}, "answerText": "Dividend → Number being divided; Divisor → Number by which we divide; Quotient → Number of full groups; Remainder → Leftover"}, {"type": "Match", "num": 106, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Lemma"}, {"letter": "B", "text": "Euclid"}, {"letter": "C", "text": "Real Numbers"}, {"letter": "D", "text": "Division"}], "right": [{"number": "1", "text": "Equal grouping"}, {"number": "2", "text": "Greek mathematician"}, {"number": "3", "text": "Class 9 chapter idea"}, {"number": "4", "text": "Proven supporting statement"}], "answerMap": {"Lemma": "Proven supporting statement", "Euclid": "Greek mathematician", "Real Numbers": "Class 9 chapter idea", "Division": "Equal grouping"}, "answerText": "Lemma → Proven supporting statement; Euclid → Greek mathematician; Real Numbers → Class 9 chapter idea; Division → Equal grouping"}, {"type": "Match", "num": 107, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$a=bq+r$"}, {"letter": "B", "text": "$0\\leq r<b$"}, {"letter": "C", "text": "$r=0$"}, {"letter": "D", "text": "$r>b$"}], "right": [{"number": "1", "text": "Exact divisibility"}, {"number": "2", "text": "Invalid remainder"}, {"number": "3", "text": "Main formula"}, {"number": "4", "text": "Remainder condition"}], "answerMap": {"$a=bq+r$": "Main formula", "$0\\leq r<b$": "Remainder condition", "$r=0$": "Exact divisibility", "$r>b$": "Invalid remainder"}, "answerText": "$a=bq+r$ → Main formula; $0\\leq r<b$ → Remainder condition; $r=0$ → Exact divisibility; $r>b$ → Invalid remainder"}, {"type": "Match", "num": 108, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$20=3\\times6+2$"}, {"letter": "B", "text": "$7=15\\times0+7$"}, {"letter": "C", "text": "$35=5\\times7+0$"}, {"letter": "D", "text": "$58=9\\times6+4$"}], "right": [{"number": "1", "text": "Remainder 7"}, {"number": "2", "text": "Remainder 2"}, {"number": "3", "text": "Remainder 0"}, {"number": "4", "text": "Remainder 4"}], "answerMap": {"$20=3\\times6+2$": "Remainder 2", "$7=15\\times0+7$": "Remainder 7", "$35=5\\times7+0$": "Remainder 0", "$58=9\\times6+4$": "Remainder 4"}, "answerText": "$20=3\\times6+2$ → Remainder 2; $7=15\\times0+7$ → Remainder 7; $35=5\\times7+0$ → Remainder 0; $58=9\\times6+4$ → Remainder 4"}, {"type": "Match", "num": 109, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Divide by 2"}, {"letter": "B", "text": "Divide by 3"}, {"letter": "C", "text": "Divide by 4"}, {"letter": "D", "text": "Divide by 5"}], "right": [{"number": "1", "text": "Remainders 0 to 4"}, {"number": "2", "text": "Remainders 0 to 1"}, {"number": "3", "text": "Remainders 0 to 3"}, {"number": "4", "text": "Remainders 0 to 2"}], "answerMap": {"Divide by 2": "Remainders 0 to 1", "Divide by 3": "Remainders 0 to 2", "Divide by 4": "Remainders 0 to 3", "Divide by 5": "Remainders 0 to 4"}, "answerText": "Divide by 2 → Remainders 0 to 1; Divide by 3 → Remainders 0 to 2; Divide by 4 → Remainders 0 to 3; Divide by 5 → Remainders 0 to 4"}, {"type": "Match", "num": 110, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Chocolate example"}, {"letter": "B", "text": "Bus example"}, {"letter": "C", "text": "Apple packing"}, {"letter": "D", "text": "Textbook example"}], "right": [{"number": "1", "text": "58 divided by 9"}, {"number": "2", "text": "83 divided by 12"}, {"number": "3", "text": "47 divided by 10"}, {"number": "4", "text": "Sharing equally"}], "answerMap": {"Chocolate example": "Sharing equally", "Bus example": "47 divided by 10", "Apple packing": "83 divided by 12", "Textbook example": "58 divided by 9"}, "answerText": "Chocolate example → Sharing equally; Bus example → 47 divided by 10; Apple packing → 83 divided by 12; Textbook example → 58 divided by 9"}, {"type": "Match", "num": 111, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$17=5\\times3+2$"}, {"letter": "B", "text": "$29=4\\times7+1$"}, {"letter": "C", "text": "$36=6\\times6+0$"}, {"letter": "D", "text": "$8=10\\times0+8$"}], "right": [{"number": "1", "text": "q=0, r=8"}, {"number": "2", "text": "q=3, r=2"}, {"number": "3", "text": "q=6, r=0"}, {"number": "4", "text": "q=7, r=1"}], "answerMap": {"$17=5\\times3+2$": "q=3, r=2", "$29=4\\times7+1$": "q=7, r=1", "$36=6\\times6+0$": "q=6, r=0", "$8=10\\times0+8$": "q=0, r=8"}, "answerText": "$17=5\\times3+2$ → q=3, r=2; $29=4\\times7+1$ → q=7, r=1; $36=6\\times6+0$ → q=6, r=0; $8=10\\times0+8$ → q=0, r=8"}, {"type": "Match", "num": 112, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Remainder smaller than divisor"}, {"letter": "B", "text": "Remainder zero"}, {"letter": "C", "text": "Negative remainder"}, {"letter": "D", "text": "Remainder equal to divisor"}], "right": [{"number": "1", "text": "Invalid"}, {"number": "2", "text": "Correct rule"}, {"number": "3", "text": "Exact division"}, {"number": "4", "text": "Invalid"}], "answerMap": {"Remainder smaller than divisor": "Correct rule", "Remainder zero": "Exact division", "Negative remainder": "Invalid", "Remainder equal to divisor": "Invalid"}, "answerText": "Remainder smaller than divisor → Correct rule; Remainder zero → Exact division; Negative remainder → Invalid; Remainder equal to divisor → Invalid"}, {"type": "Match", "num": 113, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$64=7\\times9+1$"}, {"letter": "B", "text": "$90=11\\times8+2$"}, {"letter": "C", "text": "$121=10\\times12+1$"}, {"letter": "D", "text": "$45=6\\times7+3$"}], "right": [{"number": "1", "text": "Divide 45 by 6"}, {"number": "2", "text": "Divide 64 by 7"}, {"number": "3", "text": "Divide 90 by 11"}, {"number": "4", "text": "Divide 121 by 10"}], "answerMap": {"$64=7\\times9+1$": "Divide 64 by 7", "$90=11\\times8+2$": "Divide 90 by 11", "$121=10\\times12+1$": "Divide 121 by 10", "$45=6\\times7+3$": "Divide 45 by 6"}, "answerText": "$64=7\\times9+1$ → Divide 64 by 7; $90=11\\times8+2$ → Divide 90 by 11; $121=10\\times12+1$ → Divide 121 by 10; $45=6\\times7+3$ → Divide 45 by 6"}, {"type": "Match", "num": 114, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$100=9\\times11+1$"}, {"letter": "B", "text": "$18=25\\times0+18$"}, {"letter": "C", "text": "$72=8\\times9+0$"}, {"letter": "D", "text": "$56=5\\times11+1$"}], "right": [{"number": "1", "text": "Remainder 0"}, {"number": "2", "text": "Remainder 18"}, {"number": "3", "text": "Remainder 1"}, {"number": "4", "text": "Remainder 1"}], "answerMap": {"$100=9\\times11+1$": "Remainder 1", "$18=25\\times0+18$": "Remainder 18", "$72=8\\times9+0$": "Remainder 0", "$56=5\\times11+1$": "Remainder 1"}, "answerText": "$100=9\\times11+1$ → Remainder 1; $18=25\\times0+18$ → Remainder 18; $72=8\\times9+0$ → Remainder 0; $56=5\\times11+1$ → Remainder 1"}, {"type": "Match", "num": 115, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$99=4\\times24+3$"}, {"letter": "B", "text": "$150=13\\times11+7$"}, {"letter": "C", "text": "$47=6\\times7+5$"}, {"letter": "D", "text": "$81=9\\times9+0$"}], "right": [{"number": "1", "text": "q=9, r=0"}, {"number": "2", "text": "q=24, r=3"}, {"number": "3", "text": "q=11, r=7"}, {"number": "4", "text": "q=7, r=5"}], "answerMap": {"$99=4\\times24+3$": "q=24, r=3", "$150=13\\times11+7$": "q=11, r=7", "$47=6\\times7+5$": "q=7, r=5", "$81=9\\times9+0$": "q=9, r=0"}, "answerText": "$99=4\\times24+3$ → q=24, r=3; $150=13\\times11+7$ → q=11, r=7; $47=6\\times7+5$ → q=7, r=5; $81=9\\times9+0$ → q=9, r=0"}, {"type": "Match", "num": 116, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "A"}, {"letter": "B", "text": "Big"}, {"letter": "C", "text": "Queen"}, {"letter": "D", "text": "Rested"}], "right": [{"number": "1", "text": "q"}, {"number": "2", "text": "r"}, {"number": "3", "text": "a"}, {"number": "4", "text": "b"}], "answerMap": {"A": "a", "Big": "b", "Queen": "q", "Rested": "r"}, "answerText": "A → a; Big → b; Queen → q; Rested → r"}, {"type": "Match", "num": 117, "level": "Basic", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Positive integers"}, {"letter": "B", "text": "Non-negative integers"}, {"letter": "C", "text": "Remainder condition"}, {"letter": "D", "text": "Exact division"}], "right": [{"number": "1", "text": "0,1,2,3,..."}, {"number": "2", "text": "1,2,3,4,..."}, {"number": "3", "text": "$0\\leq r<b$"}, {"number": "4", "text": "$r=0$"}], "answerMap": {"Positive integers": "1,2,3,4,...", "Non-negative integers": "0,1,2,3,...", "Remainder condition": "$0\\leq r<b$", "Exact division": "$r=0$"}, "answerText": "Positive integers → 1,2,3,4,...; Non-negative integers → 0,1,2,3,...; Remainder condition → $0\\leq r<b$; Exact division → $r=0$"}, {"type": "Match", "num": 118, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$2q$"}, {"letter": "B", "text": "$2q+1$"}, {"letter": "C", "text": "$3q+2$"}, {"letter": "D", "text": "$4q+3$"}], "right": [{"number": "1", "text": "Remainder 3 on division by 4"}, {"number": "2", "text": "Even number"}, {"number": "3", "text": "Odd number"}, {"number": "4", "text": "Remainder 2 on division by 3"}], "answerMap": {"$2q$": "Even number", "$2q+1$": "Odd number", "$3q+2$": "Remainder 2 on division by 3", "$4q+3$": "Remainder 3 on division by 4"}, "answerText": "$2q$ → Even number; $2q+1$ → Odd number; $3q+2$ → Remainder 2 on division by 3; $4q+3$ → Remainder 3 on division by 4"}, {"type": "Match", "num": 119, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Divisor 2"}, {"letter": "B", "text": "Divisor 3"}, {"letter": "C", "text": "Divisor 6"}, {"letter": "D", "text": "Divisor 7"}], "right": [{"number": "1", "text": "0,1,2,3,4,5,6"}, {"number": "2", "text": "0,1"}, {"number": "3", "text": "0,1,2,3,4,5"}, {"number": "4", "text": "0,1,2"}], "answerMap": {"Divisor 2": "0,1", "Divisor 3": "0,1,2", "Divisor 6": "0,1,2,3,4,5", "Divisor 7": "0,1,2,3,4,5,6"}, "answerText": "Divisor 2 → 0,1; Divisor 3 → 0,1,2; Divisor 6 → 0,1,2,3,4,5; Divisor 7 → 0,1,2,3,4,5,6"}, {"type": "Match", "num": 120, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$3q$"}, {"letter": "B", "text": "$3q+1$"}, {"letter": "C", "text": "$3q+2$"}, {"letter": "D", "text": "$5q+4$"}], "right": [{"number": "1", "text": "Remainder 4 on division by 5"}, {"number": "2", "text": "Remainder 2 on division by 3"}, {"number": "3", "text": "Remainder 0 on division by 3"}, {"number": "4", "text": "Remainder 1 on division by 3"}], "answerMap": {"$3q$": "Remainder 0 on division by 3", "$3q+1$": "Remainder 1 on division by 3", "$3q+2$": "Remainder 2 on division by 3", "$5q+4$": "Remainder 4 on division by 5"}, "answerText": "$3q$ → Remainder 0 on division by 3; $3q+1$ → Remainder 1 on division by 3; $3q+2$ → Remainder 2 on division by 3; $5q+4$ → Remainder 4 on division by 5"}, {"type": "Match", "num": 121, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$4q$"}, {"letter": "B", "text": "$4q+1$"}, {"letter": "C", "text": "$4q+2$"}, {"letter": "D", "text": "$4q+3$"}], "right": [{"number": "1", "text": "Remainder 1"}, {"number": "2", "text": "Remainder 0"}, {"number": "3", "text": "Remainder 3"}, {"number": "4", "text": "Remainder 2"}], "answerMap": {"$4q$": "Remainder 0", "$4q+1$": "Remainder 1", "$4q+2$": "Remainder 2", "$4q+3$": "Remainder 3"}, "answerText": "$4q$ → Remainder 0; $4q+1$ → Remainder 1; $4q+2$ → Remainder 2; $4q+3$ → Remainder 3"}, {"type": "Match", "num": 122, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$12$"}, {"letter": "B", "text": "$13$"}, {"letter": "C", "text": "$14$"}, {"letter": "D", "text": "$15$"}], "right": [{"number": "1", "text": "$3\\times5+0$"}, {"number": "2", "text": "$3\\times4+0$"}, {"number": "3", "text": "$3\\times4+1$"}, {"number": "4", "text": "$3\\times4+2$"}], "answerMap": {"$12$": "$3\\times4+0$", "$13$": "$3\\times4+1$", "$14$": "$3\\times4+2$", "$15$": "$3\\times5+0$"}, "answerText": "$12$ → $3\\times4+0$; $13$ → $3\\times4+1$; $14$ → $3\\times4+2$; $15$ → $3\\times5+0$"}, {"type": "Match", "num": 123, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$20$"}, {"letter": "B", "text": "$21$"}, {"letter": "C", "text": "$22$"}, {"letter": "D", "text": "$23$"}], "right": [{"number": "1", "text": "$4\\times5+3$"}, {"number": "2", "text": "$4\\times5+0$"}, {"number": "3", "text": "$4\\times5+1$"}, {"number": "4", "text": "$4\\times5+2$"}], "answerMap": {"$20$": "$4\\times5+0$", "$21$": "$4\\times5+1$", "$22$": "$4\\times5+2$", "$23$": "$4\\times5+3$"}, "answerText": "$20$ → $4\\times5+0$; $21$ → $4\\times5+1$; $22$ → $4\\times5+2$; $23$ → $4\\times5+3$"}, {"type": "Match", "num": 124, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$8$"}, {"letter": "B", "text": "$9$"}, {"letter": "C", "text": "$14$"}, {"letter": "D", "text": "$15$"}], "right": [{"number": "1", "text": "Odd"}, {"number": "2", "text": "Even"}, {"number": "3", "text": "Odd"}, {"number": "4", "text": "Even"}], "answerMap": {"$8$": "Even", "$9$": "Odd", "$14$": "Even", "$15$": "Odd"}, "answerText": "$8$ → Even; $9$ → Odd; $14$ → Even; $15$ → Odd"}, {"type": "Match", "num": 125, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$103=8\\times12+7$"}, {"letter": "B", "text": "$75=12\\times6+3$"}, {"letter": "C", "text": "$135=11\\times12+3$"}, {"letter": "D", "text": "$100=13\\times7+9$"}], "right": [{"number": "1", "text": "q=12,r=3"}, {"number": "2", "text": "q=12,r=7"}, {"number": "3", "text": "q=7,r=9"}, {"number": "4", "text": "q=6,r=3"}], "answerMap": {"$103=8\\times12+7$": "q=12,r=7", "$75=12\\times6+3$": "q=6,r=3", "$135=11\\times12+3$": "q=12,r=3", "$100=13\\times7+9$": "q=7,r=9"}, "answerText": "$103=8\\times12+7$ → q=12,r=7; $75=12\\times6+3$ → q=6,r=3; $135=11\\times12+3$ → q=12,r=3; $100=13\\times7+9$ → q=7,r=9"}, {"type": "Match", "num": 126, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Invalid: $20=3\\times5+5$"}, {"letter": "B", "text": "Valid: $20=3\\times6+2$"}, {"letter": "C", "text": "Invalid: $41=6\\times5+11$"}, {"letter": "D", "text": "Valid: $41=6\\times6+5$"}], "right": [{"number": "1", "text": "Remainder 5 < 6"}, {"number": "2", "text": "Remainder 11 > 6"}, {"number": "3", "text": "Remainder 2 < 3"}, {"number": "4", "text": "Remainder 5 > 3"}], "answerMap": {"Invalid: $20=3\\times5+5$": "Remainder 5 > 3", "Valid: $20=3\\times6+2$": "Remainder 2 < 3", "Invalid: $41=6\\times5+11$": "Remainder 11 > 6", "Valid: $41=6\\times6+5$": "Remainder 5 < 6"}, "answerText": "Invalid: $20=3\\times5+5$ → Remainder 5 > 3; Valid: $20=3\\times6+2$ → Remainder 2 < 3; Invalid: $41=6\\times5+11$ → Remainder 11 > 6; Valid: $41=6\\times6+5$ → Remainder 5 < 6"}, {"type": "Match", "num": 127, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$5q$"}, {"letter": "B", "text": "$5q+1$"}, {"letter": "C", "text": "$5q+2$"}, {"letter": "D", "text": "$5q+4$"}], "right": [{"number": "1", "text": "Remainder 2"}, {"number": "2", "text": "Remainder 4"}, {"number": "3", "text": "Remainder 0"}, {"number": "4", "text": "Remainder 1"}], "answerMap": {"$5q$": "Remainder 0", "$5q+1$": "Remainder 1", "$5q+2$": "Remainder 2", "$5q+4$": "Remainder 4"}, "answerText": "$5q$ → Remainder 0; $5q+1$ → Remainder 1; $5q+2$ → Remainder 2; $5q+4$ → Remainder 4"}, {"type": "Match", "num": 128, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$6q$"}, {"letter": "B", "text": "$6q+1$"}, {"letter": "C", "text": "$6q+4$"}, {"letter": "D", "text": "$6q+5$"}], "right": [{"number": "1", "text": "Remainder 5"}, {"number": "2", "text": "Remainder 4"}, {"number": "3", "text": "Remainder 0"}, {"number": "4", "text": "Remainder 1"}], "answerMap": {"$6q$": "Remainder 0", "$6q+1$": "Remainder 1", "$6q+4$": "Remainder 4", "$6q+5$": "Remainder 5"}, "answerText": "$6q$ → Remainder 0; $6q+1$ → Remainder 1; $6q+4$ → Remainder 4; $6q+5$ → Remainder 5"}, {"type": "Match", "num": 129, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$7q$"}, {"letter": "B", "text": "$7q+2$"}, {"letter": "C", "text": "$7q+5$"}, {"letter": "D", "text": "$7q+6$"}], "right": [{"number": "1", "text": "Remainder 6"}, {"number": "2", "text": "Remainder 0"}, {"number": "3", "text": "Remainder 5"}, {"number": "4", "text": "Remainder 2"}], "answerMap": {"$7q$": "Remainder 0", "$7q+2$": "Remainder 2", "$7q+5$": "Remainder 5", "$7q+6$": "Remainder 6"}, "answerText": "$7q$ → Remainder 0; $7q+2$ → Remainder 2; $7q+5$ → Remainder 5; $7q+6$ → Remainder 6"}, {"type": "Match", "num": 130, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$a=2q$"}, {"letter": "B", "text": "$a=2q+1$"}, {"letter": "C", "text": "$a=3q+r$"}, {"letter": "D", "text": "$a=4q+r$"}], "right": [{"number": "1", "text": "$r=0,1,2,3$"}, {"number": "2", "text": "Even number"}, {"number": "3", "text": "$r=0,1,2$"}, {"number": "4", "text": "Odd number"}], "answerMap": {"$a=2q$": "Even number", "$a=2q+1$": "Odd number", "$a=3q+r$": "$r=0,1,2$", "$a=4q+r$": "$r=0,1,2,3$"}, "answerText": "$a=2q$ → Even number; $a=2q+1$ → Odd number; $a=3q+r$ → $r=0,1,2$; $a=4q+r$ → $r=0,1,2,3$"}, {"type": "Match", "num": 131, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$47$ by $10$"}, {"letter": "B", "text": "$83$ by $12$"}, {"letter": "C", "text": "$58$ by $9$"}, {"letter": "D", "text": "$25$ by $7$"}], "right": [{"number": "1", "text": "$25=7\\times3+4$"}, {"number": "2", "text": "$58=9\\times6+4$"}, {"number": "3", "text": "$83=12\\times6+11$"}, {"number": "4", "text": "$47=10\\times4+7$"}], "answerMap": {"$47$ by $10$": "$47=10\\times4+7$", "$83$ by $12$": "$83=12\\times6+11$", "$58$ by $9$": "$58=9\\times6+4$", "$25$ by $7$": "$25=7\\times3+4$"}, "answerText": "$47$ by $10$ → $47=10\\times4+7$; $83$ by $12$ → $83=12\\times6+11$; $58$ by $9$ → $58=9\\times6+4$; $25$ by $7$ → $25=7\\times3+4$"}, {"type": "Match", "num": 132, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Remainder rule"}, {"letter": "B", "text": "Possible remainders"}, {"letter": "C", "text": "Even form"}, {"letter": "D", "text": "Odd form"}], "right": [{"number": "1", "text": "$2q+1$"}, {"number": "2", "text": "$0\\leq r<b$"}, {"number": "3", "text": "$0,1,2,...,b-1$"}, {"number": "4", "text": "$2q$"}], "answerMap": {"Remainder rule": "$0\\leq r<b$", "Possible remainders": "$0,1,2,...,b-1$", "Even form": "$2q$", "Odd form": "$2q+1$"}, "answerText": "Remainder rule → $0\\leq r<b$; Possible remainders → $0,1,2,...,b-1$; Even form → $2q$; Odd form → $2q+1$"}, {"type": "Match", "num": 133, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$30=7\\times4+2$"}, {"letter": "B", "text": "$30=7\\times3+9$"}, {"letter": "C", "text": "$30=7\\times5-5$"}, {"letter": "D", "text": "$35=5\\times7+0$"}], "right": [{"number": "1", "text": "Invalid: negative remainder"}, {"number": "2", "text": "Valid: exact division"}, {"number": "3", "text": "Invalid: remainder too large"}, {"number": "4", "text": "Valid: remainder 2"}], "answerMap": {"$30=7\\times4+2$": "Valid: remainder 2", "$30=7\\times3+9$": "Invalid: remainder too large", "$30=7\\times5-5$": "Invalid: negative remainder", "$35=5\\times7+0$": "Valid: exact division"}, "answerText": "$30=7\\times4+2$ → Valid: remainder 2; $30=7\\times3+9$ → Invalid: remainder too large; $30=7\\times5-5$ → Invalid: negative remainder; $35=5\\times7+0$ → Valid: exact division"}, {"type": "Match", "num": 134, "level": "Intermediate", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$a=3q$"}, {"letter": "B", "text": "$a=3q+1$"}, {"letter": "C", "text": "$a=3q+2$"}, {"letter": "D", "text": "$a=5q+3$"}], "right": [{"number": "1", "text": "Division by 5 remainder 3"}, {"number": "2", "text": "Division by 3 remainder 2"}, {"number": "3", "text": "Division by 3 remainder 0"}, {"number": "4", "text": "Division by 3 remainder 1"}], "answerMap": {"$a=3q$": "Division by 3 remainder 0", "$a=3q+1$": "Division by 3 remainder 1", "$a=3q+2$": "Division by 3 remainder 2", "$a=5q+3$": "Division by 5 remainder 3"}, "answerText": "$a=3q$ → Division by 3 remainder 0; $a=3q+1$ → Division by 3 remainder 1; $a=3q+2$ → Division by 3 remainder 2; $a=5q+3$ → Division by 5 remainder 3"}, {"type": "Match", "num": 135, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Uniqueness"}, {"letter": "B", "text": "Arithmetic progression"}, {"letter": "C", "text": "HCF"}, {"letter": "D", "text": "Odd square"}], "right": [{"number": "1", "text": "$4q+1$"}, {"number": "2", "text": "Only one valid q and r"}, {"number": "3", "text": "Multiples with common difference"}, {"number": "4", "text": "Highest common factor"}], "answerMap": {"Uniqueness": "Only one valid q and r", "Arithmetic progression": "Multiples with common difference", "HCF": "Highest common factor", "Odd square": "$4q+1$"}, "answerText": "Uniqueness → Only one valid q and r; Arithmetic progression → Multiples with common difference; HCF → Highest common factor; Odd square → $4q+1$"}, {"type": "Match", "num": 136, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$58=9\\times5+13$"}, {"letter": "B", "text": "$58=9\\times7-5$"}, {"letter": "C", "text": "$58=9\\times6+4$"}, {"letter": "D", "text": "$35=5\\times7+0$"}], "right": [{"number": "1", "text": "Valid exact division"}, {"number": "2", "text": "Invalid: remainder too large"}, {"number": "3", "text": "Invalid: negative remainder"}, {"number": "4", "text": "Valid Euclid form"}], "answerMap": {"$58=9\\times5+13$": "Invalid: remainder too large", "$58=9\\times7-5$": "Invalid: negative remainder", "$58=9\\times6+4$": "Valid Euclid form", "$35=5\\times7+0$": "Valid exact division"}, "answerText": "$58=9\\times5+13$ → Invalid: remainder too large; $58=9\\times7-5$ → Invalid: negative remainder; $58=9\\times6+4$ → Valid Euclid form; $35=5\\times7+0$ → Valid exact division"}, {"type": "Match", "num": 137, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$r-t=b(s-q)$"}, {"letter": "B", "text": "$r-t=0$"}, {"letter": "C", "text": "$r=t$"}, {"letter": "D", "text": "$q=s$"}], "right": [{"number": "1", "text": "Final quotient equality"}, {"number": "2", "text": "Multiple of b relation"}, {"number": "3", "text": "Remainders equal"}, {"number": "4", "text": "Difference is zero"}], "answerMap": {"$r-t=b(s-q)$": "Multiple of b relation", "$r-t=0$": "Difference is zero", "$r=t$": "Remainders equal", "$q=s$": "Final quotient equality"}, "answerText": "$r-t=b(s-q)$ → Multiple of b relation; $r-t=0$ → Difference is zero; $r=t$ → Remainders equal; $q=s$ → Final quotient equality"}, {"type": "Match", "num": 138, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$\\ldots,-3b,-2b,-b,0,b,2b,3b,\\ldots$"}, {"letter": "B", "text": "$bq$"}, {"letter": "C", "text": "$r=a-bq$"}, {"letter": "D", "text": "$0\\leq r<b$"}], "right": [{"number": "1", "text": "Remainder formula"}, {"number": "2", "text": "Multiples of b"}, {"number": "3", "text": "Remainder condition"}, {"number": "4", "text": "Largest multiple not exceeding a"}], "answerMap": {"$\\ldots,-3b,-2b,-b,0,b,2b,3b,\\ldots$": "Multiples of b", "$bq$": "Largest multiple not exceeding a", "$r=a-bq$": "Remainder formula", "$0\\leq r<b$": "Remainder condition"}, "answerText": "$\\ldots,-3b,-2b,-b,0,b,2b,3b,\\ldots$ → Multiples of b; $bq$ → Largest multiple not exceeding a; $r=a-bq$ → Remainder formula; $0\\leq r<b$ → Remainder condition"}, {"type": "Match", "num": 139, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$2m+1$"}, {"letter": "B", "text": "$(2m+1)^2$"}, {"letter": "C", "text": "$4(m^2+m)+1$"}, {"letter": "D", "text": "$4q+1$"}], "right": [{"number": "1", "text": "Odd integer"}, {"number": "2", "text": "Odd square expanded form"}, {"number": "3", "text": "Final form"}, {"number": "4", "text": "Square of odd integer"}], "answerMap": {"$2m+1$": "Odd integer", "$(2m+1)^2$": "Square of odd integer", "$4(m^2+m)+1$": "Odd square expanded form", "$4q+1$": "Final form"}, "answerText": "$2m+1$ → Odd integer; $(2m+1)^2$ → Square of odd integer; $4(m^2+m)+1$ → Odd square expanded form; $4q+1$ → Final form"}, {"type": "Match", "num": 140, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$a=3q$"}, {"letter": "B", "text": "$a=3q+1$"}, {"letter": "C", "text": "$a=3q+2$"}, {"letter": "D", "text": "$a^2$"}], "right": [{"number": "1", "text": "Case 2"}, {"number": "2", "text": "Square form 3q or 3q+1"}, {"number": "3", "text": "Case 1"}, {"number": "4", "text": "Case 3"}], "answerMap": {"$a=3q$": "Case 1", "$a=3q+1$": "Case 2", "$a=3q+2$": "Case 3", "$a^2$": "Square form 3q or 3q+1"}, "answerText": "$a=3q$ → Case 1; $a=3q+1$ → Case 2; $a=3q+2$ → Case 3; $a^2$ → Square form 3q or 3q+1"}, {"type": "Match", "num": 141, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$225=135\\times1+90$"}, {"letter": "B", "text": "$135=90\\times1+45$"}, {"letter": "C", "text": "$90=45\\times2+0$"}, {"letter": "D", "text": "HCF"}], "right": [{"number": "1", "text": "45"}, {"number": "2", "text": "Remainder 0 step"}, {"number": "3", "text": "Remainder 90 step"}, {"number": "4", "text": "Remainder 45 step"}], "answerMap": {"$225=135\\times1+90$": "Remainder 90 step", "$135=90\\times1+45$": "Remainder 45 step", "$90=45\\times2+0$": "Remainder 0 step", "HCF": "45"}, "answerText": "$225=135\\times1+90$ → Remainder 90 step; $135=90\\times1+45$ → Remainder 45 step; $90=45\\times2+0$ → Remainder 0 step; HCF → 45"}, {"type": "Match", "num": 142, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Euclid’s Division Lemma"}, {"letter": "B", "text": "Euclid’s Division Algorithm"}, {"letter": "C", "text": "Remainder zero"}, {"letter": "D", "text": "Last non-zero divisor"}], "right": [{"number": "1", "text": "Exact divisibility"}, {"number": "2", "text": "Used to find HCF"}, {"number": "3", "text": "HCF"}, {"number": "4", "text": "$a=bq+r$"}], "answerMap": {"Euclid’s Division Lemma": "$a=bq+r$", "Euclid’s Division Algorithm": "Used to find HCF", "Remainder zero": "Exact divisibility", "Last non-zero divisor": "HCF"}, "answerText": "Euclid’s Division Lemma → $a=bq+r$; Euclid’s Division Algorithm → Used to find HCF; Remainder zero → Exact divisibility; Last non-zero divisor → HCF"}, {"type": "Match", "num": 143, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$a^2=9q^2$"}, {"letter": "B", "text": "$a^2=9q^2+6q+1$"}, {"letter": "C", "text": "$a^2=9q^2+12q+4$"}, {"letter": "D", "text": "$3(3q^2+4q+1)+1$"}], "right": [{"number": "1", "text": "For $a=3q+2$"}, {"number": "2", "text": "For $a=3q$"}, {"number": "3", "text": "Simplified case 3"}, {"number": "4", "text": "For $a=3q+1$"}], "answerMap": {"$a^2=9q^2$": "For $a=3q$", "$a^2=9q^2+6q+1$": "For $a=3q+1$", "$a^2=9q^2+12q+4$": "For $a=3q+2$", "$3(3q^2+4q+1)+1$": "Simplified case 3"}, "answerText": "$a^2=9q^2$ → For $a=3q$; $a^2=9q^2+6q+1$ → For $a=3q+1$; $a^2=9q^2+12q+4$ → For $a=3q+2$; $3(3q^2+4q+1)+1$ → Simplified case 3"}, {"type": "Match", "num": 144, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Proof step 1"}, {"letter": "B", "text": "Proof step 2"}, {"letter": "C", "text": "Proof step 3"}, {"letter": "D", "text": "Proof conclusion"}], "right": [{"number": "1", "text": "$q=s$"}, {"number": "2", "text": "$bq+r=bs+t$"}, {"number": "3", "text": "$r=t$"}, {"number": "4", "text": "$r-t=b(s-q)$"}], "answerMap": {"Proof step 1": "$bq+r=bs+t$", "Proof step 2": "$r-t=b(s-q)$", "Proof step 3": "$r=t$", "Proof conclusion": "$q=s$"}, "answerText": "Proof step 1 → $bq+r=bs+t$; Proof step 2 → $r-t=b(s-q)$; Proof step 3 → $r=t$; Proof conclusion → $q=s$"}, {"type": "Match", "num": 145, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$r>b$"}, {"letter": "B", "text": "$r<0$"}, {"letter": "C", "text": "$0\\leq r<b$"}, {"letter": "D", "text": "$r=0$"}], "right": [{"number": "1", "text": "Exact division"}, {"number": "2", "text": "Valid condition"}, {"number": "3", "text": "Too large remainder"}, {"number": "4", "text": "Negative remainder"}], "answerMap": {"$r>b$": "Too large remainder", "$r<0$": "Negative remainder", "$0\\leq r<b$": "Valid condition", "$r=0$": "Exact division"}, "answerText": "$r>b$ → Too large remainder; $r<0$ → Negative remainder; $0\\leq r<b$ → Valid condition; $r=0$ → Exact division"}, {"type": "Match", "num": 146, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$156=12\\times13+0$"}, {"letter": "B", "text": "$83=12\\times6+11$"}, {"letter": "C", "text": "$47=10\\times4+7$"}, {"letter": "D", "text": "$58=9\\times6+4$"}], "right": [{"number": "1", "text": "Chocolate sharing"}, {"number": "2", "text": "Bus seating"}, {"number": "3", "text": "Mango box packing"}, {"number": "4", "text": "Apple packing"}], "answerMap": {"$156=12\\times13+0$": "Mango box packing", "$83=12\\times6+11$": "Apple packing", "$47=10\\times4+7$": "Bus seating", "$58=9\\times6+4$": "Chocolate sharing"}, "answerText": "$156=12\\times13+0$ → Mango box packing; $83=12\\times6+11$ → Apple packing; $47=10\\times4+7$ → Bus seating; $58=9\\times6+4$ → Chocolate sharing"}, {"type": "Match", "num": 147, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$4q$"}, {"letter": "B", "text": "$4q+1$"}, {"letter": "C", "text": "$4q+2$"}, {"letter": "D", "text": "$4q+3$"}], "right": [{"number": "1", "text": "Possible form but not odd square"}, {"number": "2", "text": "Odd square form"}, {"number": "3", "text": "Possible remainder 2 form"}, {"number": "4", "text": "Possible remainder 3 form"}], "answerMap": {"$4q$": "Possible form but not odd square", "$4q+1$": "Odd square form", "$4q+2$": "Possible remainder 2 form", "$4q+3$": "Possible remainder 3 form"}, "answerText": "$4q$ → Possible form but not odd square; $4q+1$ → Odd square form; $4q+2$ → Possible remainder 2 form; $4q+3$ → Possible remainder 3 form"}, {"type": "Match", "num": 148, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$3q$"}, {"letter": "B", "text": "$3q+1$"}, {"letter": "C", "text": "$3q+2$"}, {"letter": "D", "text": "Square of any integer"}], "right": [{"number": "1", "text": "Initial possible form"}, {"number": "2", "text": "Square final form possible"}, {"number": "3", "text": "Initial possible form"}, {"number": "4", "text": "$3q$ or $3q+1$"}], "answerMap": {"$3q$": "Initial possible form", "$3q+1$": "Square final form possible", "$3q+2$": "Initial possible form", "Square of any integer": "$3q$ or $3q+1$"}, "answerText": "$3q$ → Initial possible form; $3q+1$ → Square final form possible; $3q+2$ → Initial possible form; Square of any integer → $3q$ or $3q+1$"}, {"type": "Match", "num": 149, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "Algorithm start"}, {"letter": "B", "text": "Next division"}, {"letter": "C", "text": "Stopping condition"}, {"letter": "D", "text": "Answer"}], "right": [{"number": "1", "text": "Remainder 0"}, {"number": "2", "text": "Divide larger by smaller"}, {"number": "3", "text": "Divide previous divisor by previous remainder"}, {"number": "4", "text": "HCF"}], "answerMap": {"Algorithm start": "Divide larger by smaller", "Next division": "Divide previous divisor by previous remainder", "Stopping condition": "Remainder 0", "Answer": "HCF"}, "answerText": "Algorithm start → Divide larger by smaller; Next division → Divide previous divisor by previous remainder; Stopping condition → Remainder 0; Answer → HCF"}, {"type": "Match", "num": 150, "level": "Advanced", "question": "Match Column A with Column B.", "left": [{"letter": "A", "text": "$bq$"}, {"letter": "B", "text": "$r$"}, {"letter": "C", "text": "$a$"}, {"letter": "D", "text": "$b$"}], "right": [{"number": "1", "text": "Number being divided"}, {"number": "2", "text": "Divisor"}, {"number": "3", "text": "Largest multiple part"}, {"number": "4", "text": "Leftover"}], "answerMap": {"$bq$": "Largest multiple part", "$r$": "Leftover", "$a$": "Number being divided", "$b$": "Divisor"}, "answerText": "$bq$ → Largest multiple part; $r$ → Leftover; $a$ → Number being divided; $b$ → Divisor"}];
+
+const state = {
+  answers: {},
+  correct: {},
+  shown: {}
+};
+
+function normalizeText(s) {
+  return String(s)
+    .toLowerCase()
+    .replace(/\$/g, '')
+    .replace(/\\;/g, ' ')
+    .replace(/\\leq/g, '≤')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function render() {
+  const typeFilter = document.getElementById('typeFilter').value;
+  const levelFilter = document.getElementById('levelFilter').value;
+  const search = normalizeText(document.getElementById('searchBox').value);
+
+  const container = document.getElementById('questionContainer');
+  container.innerHTML = '';
+
+  let filtered = QUESTIONS.filter(q => {
+    const typeOk = typeFilter === 'All' || q.type === typeFilter;
+    const levelOk = levelFilter === 'All' || q.level === levelFilter;
+    const searchText = normalizeText(JSON.stringify(q));
+    const searchOk = !search || searchText.includes(search);
+    return typeOk && levelOk && searchOk;
+  });
+
+  let currentSection = '';
+  filtered.forEach(q => {
+    const sectionKey = q.type + ' — ' + q.level;
+    if (sectionKey !== currentSection) {
+      currentSection = sectionKey;
+      const h = document.createElement('h2');
+      h.className = 'level-title';
+      h.textContent = sectionKey;
+      container.appendChild(h);
+    }
+    container.appendChild(renderQuestion(q));
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p><strong>No questions found.</strong> Try changing the search or filters.</p>';
+  }
+
+  if (window.MathJax) MathJax.typesetPromise();
+  updateStats();
+}
+
+function renderQuestion(q) {
+  const card = document.createElement('section');
+  card.className = 'qcard ' + q.level.toLowerCase();
+  card.id = 'q-' + q.num;
+
+  const meta = `<div class="qmeta">
+    <span class="badge">${q.type === 'Fill' ? 'Fill in the Blank' : q.type}</span>
+    <span class="badge ${q.level.toLowerCase()}">${q.level}</span>
+    <span class="badge">Q${q.num}</span>
+  </div>`;
+
+  let body = meta + `<div class="qtext">${q.num}. ${q.question}</div>`;
+
+  if (q.type === 'MCQ') {
+    q.options.forEach(opt => {
+      const selected = state.answers[q.num] === opt.letter ? ' selected' : '';
+      let correctness = '';
+      if (state.answers[q.num]) {
+        if (opt.letter === q.answer) correctness = ' correct';
+        else if (state.answers[q.num] === opt.letter) correctness = ' wrong';
+      }
+      body += `<button class="option${selected}${correctness}" onclick="answerMCQ(${q.num}, '${opt.letter}')"><strong>${opt.letter}.</strong> ${opt.text}</button>`;
+    });
+    body += `<div class="answer ${state.shown[q.num] || state.answers[q.num] ? 'show' : ''}"><strong>Answer:</strong> ${q.answer}. ${q.options.find(o => o.letter === q.answer).text}${q.reason ? '<br><strong>Reason:</strong> ' + q.reason : ''}</div>`;
+  }
+
+  if (q.type === 'Fill') {
+    const val = state.answers[q.num] || '';
+    body += `<div class="fill-row">
+      <input id="fill-${q.num}" value="${escapeHtml(val)}" placeholder="Type your answer here..." onkeydown="if(event.key==='Enter') answerFill(${q.num})" />
+      <button onclick="answerFill(${q.num})">Check</button>
+      <button class="secondary" onclick="toggleAnswer(${q.num})">Show Answer</button>
+    </div>`;
+    if (state.answers[q.num]) {
+      body += `<div class="feedback ${state.correct[q.num] ? 'correct' : 'wrong'}">${state.correct[q.num] ? 'Correct ✅' : 'Try again ❌'}</div>`;
+    }
+    body += `<div class="answer ${state.shown[q.num] || state.answers[q.num] ? 'show' : ''}"><strong>Answer:</strong> ${q.answer}${q.reason ? '<br><strong>Reason:</strong> ' + q.reason : ''}</div>`;
+  }
+
+  if (q.type === 'Match') {
+    body += '<div class="matchgrid">';
+    body += '<table><thead><tr><th colspan="2">Column A</th></tr></thead><tbody>';
+    q.left.forEach(x => body += `<tr><td>${x.letter}</td><td>${x.text}</td></tr>`);
+    body += '</tbody></table>';
+    body += '<table><thead><tr><th colspan="2">Column B</th></tr></thead><tbody>';
+    q.right.forEach(x => body += `<tr><td>${x.number}</td><td>${x.text}</td></tr>`);
+    body += '</tbody></table></div>';
+
+    body += '<div>';
+    q.left.forEach(x => {
+      const selected = (state.answers[q.num] && state.answers[q.num][x.text]) || '';
+      body += `<div class="match-select-row"><div><strong>${x.letter}.</strong> ${x.text}</div><select onchange="saveMatch(${q.num}, '${encodeURIComponent(x.text)}', this.value)">
+        <option value="">Choose match</option>`;
+      q.right.forEach(r => {
+        body += `<option value="${escapeHtml(r.text)}" ${selected === r.text ? 'selected' : ''}>${r.number}. ${r.text}</option>`;
+      });
+      body += '</select></div>';
+    });
+    body += '</div>';
+    body += `<button onclick="checkMatch(${q.num})">Check Match</button> <button class="secondary" onclick="toggleAnswer(${q.num})">Show Answer</button>`;
+    if (state.answers[q.num]) {
+      body += `<div class="feedback ${state.correct[q.num] ? 'correct' : 'wrong'}">${state.correct[q.num] ? 'Correct ✅' : 'Some matches need correction ❌'}</div>`;
+    }
+    body += `<div class="answer ${state.shown[q.num] || state.answers[q.num] ? 'show' : ''}"><strong>Answer:</strong> ${q.answerText}</div>`;
+  }
+
+  card.innerHTML = body;
+  return card;
+}
+
+function getQ(num) {
+  return QUESTIONS.find(q => q.num === num);
+}
+
+function answerMCQ(num, letter) {
+  const q = getQ(num);
+  state.answers[num] = letter;
+  state.correct[num] = letter === q.answer;
+  state.shown[num] = true;
+  render();
+  document.getElementById('q-' + num)?.scrollIntoView({block:'center'});
+}
+
+function answerFill(num) {
+  const q = getQ(num);
+  const input = document.getElementById('fill-' + num);
+  const val = input.value.trim();
+  state.answers[num] = val;
+  const accepted = normalizeText(q.answer);
+  const given = normalizeText(val);
+  state.correct[num] = given === accepted || accepted.includes(given) && given.length > 0 || given.includes(accepted);
+  state.shown[num] = true;
+  render();
+  document.getElementById('q-' + num)?.scrollIntoView({block:'center'});
+}
+
+function saveMatch(num, encodedLeft, value) {
+  const left = decodeURIComponent(encodedLeft);
+  if (!state.answers[num]) state.answers[num] = {};
+  state.answers[num][left] = value;
+  updateStats();
+}
+
+function checkMatch(num) {
+  const q = getQ(num);
+  const userMap = state.answers[num] || {};
+  let ok = true;
+  q.left.forEach(x => {
+    if ((userMap[x.text] || '') !== q.answerMap[x.text]) ok = false;
+  });
+  state.correct[num] = ok;
+  state.shown[num] = true;
+  render();
+  document.getElementById('q-' + num)?.scrollIntoView({block:'center'});
+}
+
+function toggleAnswer(num) {
+  state.shown[num] = !state.shown[num];
+  render();
+  document.getElementById('q-' + num)?.scrollIntoView({block:'center'});
+}
+
+function showAllAnswers() {
+  QUESTIONS.forEach(q => state.shown[q.num] = true);
+  render();
+}
+
+function resetQuiz() {
+  if (!confirm('Reset all answers and score?')) return;
+  state.answers = {};
+  state.correct = {};
+  state.shown = {};
+  render();
+}
+
+function updateStats() {
+  const attempted = Object.keys(state.answers).length;
+  const correct = Object.values(state.correct).filter(Boolean).length;
+  const score = correct;
+  const remaining = QUESTIONS.length - attempted;
+  document.getElementById('score').textContent = score;
+  document.getElementById('attempted').textContent = attempted;
+  document.getElementById('correct').textContent = correct;
+  document.getElementById('remaining').textContent = remaining;
+  document.getElementById('progressBar').style.width = (attempted / QUESTIONS.length * 100) + '%';
+
+  const reward = getReward(score);
+  document.getElementById('rewardMini').textContent = reward.short;
+  document.getElementById('rewardTitle').textContent = reward.title;
+  document.getElementById('rewardMessage').textContent = reward.message;
+}
+
+function getReward(score) {
+  if (score >= 146) return {short:'Legend', title:'👑 Euclid Legend', message:'Superb! You have mastered the lesson. Teach one friend and earn a bonus star.'};
+  if (score >= 121) return {short:'Master', title:'🏆 Math Master', message:'Outstanding. You are ready for advanced proofs and HCF problems.'};
+  if (score >= 91) return {short:'Champion', title:'🎯 Euclid Champion', message:'Excellent. You understand basic and intermediate applications clearly.'};
+  if (score >= 61) return {short:'Explorer', title:'🚀 Division Explorer', message:'Great progress. You can solve many textbook-type questions.'};
+  if (score >= 31) return {short:'Builder', title:'🏗️ Concept Builder', message:'Good effort. Practice remainder conditions daily.'};
+  return {short:'Starter', title:'🌱 Starter Learner', message:'You have started the journey. Revise the formula and try again.'};
+}
+
+document.getElementById('searchBox').addEventListener('input', render);
+document.getElementById('typeFilter').addEventListener('change', render);
+document.getElementById('levelFilter').addEventListener('change', render);
+
+render();
+</script>
+</body>
+</html>

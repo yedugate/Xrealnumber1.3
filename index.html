@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Euclid’s Division Lemma — Class 9 CBSE Mathematics</title>
+<div style="text-align: center; margin-top: 80px; font-family: Arial, sans-serif;">
+
+  <h1>Euclid’s Division Lemma</h1>
+  <p>Click below to open the question pages</p>
+
+  <a href="questions1.html">
+    <button style="
+      padding: 15px 30px;
+      margin: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #155eaa;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;">
+      Open Questions 1
+    </button>
+  </a>
+
+  <a href="questions2.html">
+    <button style="
+      padding: 15px 30px;
+      margin: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      background-color: #168057;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;">
+      Open Questions 2
+    </button>
+  </a>
+
+</div>
+  <!-- MathJax for textbook-style mathematical signs and symbols -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #5b6475;
+      --blue: #155eaa;
+      --blue-dark: #0f3d73;
+      --blue-soft: #eaf4ff;
+      --gold: #e6a400;
+      --green: #21805a;
+      --paper: #ffffff;
+      --page: #f3f7fb;
+      --border: #dce6f2;
+      --shadow: 0 12px 35px rgba(14, 45, 78, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(21,94,170,0.14), transparent 34rem),
+        linear-gradient(180deg, #f8fbff 0%, var(--page) 100%);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      line-height: 1.62;
+      font-size: 16px;
+    }
+
+    .page {
+      width: min(980px, calc(100% - 32px));
+      margin: 34px auto;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .cover {
+      padding: 34px 44px 28px;
+      background:
+        linear-gradient(135deg, rgba(21,94,170,0.98), rgba(15,61,115,0.98)),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 2px, transparent 9px);
+      color: white;
+      position: relative;
+    }
+
+    .cover::after {
+      content: "a = bq + r";
+      position: absolute;
+      right: 34px;
+      bottom: 14px;
+      color: rgba(255,255,255,0.13);
+      font-size: 58px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .label {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .cover h1 {
+      margin: 18px 0 6px;
+      font-size: 38px;
+      line-height: 1.08;
+      letter-spacing: -0.5px;
+    }
+
+    .cover h2 {
+      margin: 0;
+      color: #dcecff;
+      font-size: 19px;
+      font-weight: 600;
+    }
+
+    .formula-strip {
+      padding: 18px 42px;
+      background: #fff8e1;
+      border-bottom: 1px solid #f0df9e;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .formula-strip .note {
+      color: #6b560a;
+      font-weight: 700;
+    }
+
+    .formula-chip {
+      padding: 10px 16px;
+      background: #ffffff;
+      border: 1px solid #efd36e;
+      border-radius: 14px;
+      color: #2c2508;
+      font-weight: 800;
+      white-space: nowrap;
+      box-shadow: 0 5px 16px rgba(143,108,0,0.10);
+    }
+
+    main {
+      padding: 34px 44px 50px;
+    }
+
+    h1, h2, h3 {
+      color: var(--blue-dark);
+      line-height: 1.25;
+    }
+
+    main > h1 {
+      margin-top: 34px;
+      padding-top: 20px;
+      border-top: 2px solid var(--border);
+      font-size: 28px;
+    }
+
+    main > h1:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    h2 {
+      margin-top: 28px;
+      font-size: 22px;
+      padding-left: 13px;
+      border-left: 5px solid var(--blue);
+    }
+
+    h3 {
+      margin-top: 24px;
+      font-size: 18px;
+      color: #23466e;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    strong {
+      color: #0f3d73;
+    }
+
+    ul, ol {
+      padding-left: 24px;
+    }
+
+    li {
+      margin: 5px 0;
+    }
+
+    hr {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 28px 0;
+    }
+
+    .edu-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 15px;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .edu-table th {
+      background: var(--blue);
+      color: white;
+      text-align: left;
+      padding: 11px 12px;
+      border: 1px solid #2f76bd;
+      font-weight: 700;
+    }
+
+    .edu-table td {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .edu-table tr:nth-child(even) td {
+      background: #f8fbff;
+    }
+
+    .MathJax, mjx-container {
+      font-size: 108% !important;
+    }
+
+    mjx-container[display="true"] {
+      margin: 15px 0 !important;
+      padding: 12px 14px;
+      background: #fbfdff;
+      border: 1px solid #dce6f2;
+      border-left: 5px solid var(--gold);
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+
+    blockquote {
+      margin: 18px 0;
+      padding: 14px 18px;
+      border-left: 5px solid var(--green);
+      background: #eefaf5;
+      border-radius: 0 12px 12px 0;
+      color: #174c39;
+    }
+
+    .print-actions {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      width: min(980px, calc(100% - 32px));
+      margin: 16px auto -18px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .print-actions button {
+      border: 0;
+      border-radius: 999px;
+      background: var(--blue);
+      color: white;
+      padding: 10px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(21,94,170,0.25);
+    }
+
+    .footer {
+      padding: 18px 44px;
+      background: #f8fbff;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 13mm 12mm;
+      }
+
+      body {
+        background: white;
+        font-size: 12.3pt;
+        color: #111;
+      }
+
+      .print-actions {
+        display: none;
+      }
+
+      .page {
+        width: 100%;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .cover {
+        padding: 20px 0 14px;
+        background: white !important;
+        color: #0f3d73;
+        border-bottom: 2px solid #0f3d73;
+      }
+
+      .cover::after {
+        display: none;
+      }
+
+      .cover h1 {
+        font-size: 26pt;
+      }
+
+      .cover h2 {
+        color: #333;
+        font-size: 13pt;
+      }
+
+      .label {
+        color: #0f3d73;
+        border-color: #0f3d73;
+        background: white;
+      }
+
+      .formula-strip {
+        grid-template-columns: 1fr;
+        padding: 10px 0;
+        background: white;
+        border-bottom: 1px solid #999;
+      }
+
+      main {
+        padding: 16px 0 0;
+      }
+
+      main > h1 {
+        break-after: avoid;
+        page-break-after: avoid;
+        font-size: 18pt;
+        margin-top: 18px;
+        padding-top: 12px;
+      }
+
+      h2, h3 {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      .edu-table {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        font-size: 10.5pt;
+      }
+
+      .edu-table th {
+        background: #e8eef7 !important;
+        color: #111;
+        border: 1px solid #777;
+      }
+
+      .edu-table td {
+        border: 1px solid #999;
+      }
+
+      mjx-container[display="true"] {
+        background: white;
+        border: 1px solid #aaa;
+        border-left: 4px solid #777;
+        padding: 7px 9px;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .footer {
+        padding: 10px 0 0;
+        border-top: 1px solid #999;
+        background: white;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page, .print-actions {
+        width: calc(100% - 18px);
+      }
+
+      .cover, main, .footer {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+
+      .cover h1 {
+        font-size: 30px;
+      }
+
+      .formula-strip {
+        grid-template-columns: 1fr;
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-actions">
+    <button onclick="window.print()">Print / Save as PDF</button>
+  </div>
+
+  <article class="page">
+    <header class="cover">
+      <span class="label">Class 9 CBSE Mathematics</span>
+      <h1>Euclid’s Division Lemma</h1>
+      <h2>Real Numbers — Printable Study Notes</h2>
+    </header>
+
+    <section class="formula-strip">
+      <div class="note">Core textbook formula</div>
+      <div class="formula-chip">\(a = bq + r,\; 0 \leq r < b\)</div>
+    </section>
+
+    <main>
+      <p>Below is the <strong>final combined version</strong> prepared from all three uploaded notes/files on <strong>Euclid’s Division Lemma</strong>. It combines the extracted textbook content, basic explanation, intermediate concepts, advanced applications, real-life examples, mistakes, and practice problems.   </p>
+<h1>Euclid’s Division Lemma</h1>
+<h2>Class 9 CBSE Mathematics — Real Numbers</h2>
+<h2>1. Introduction</h2>
+<p>Euclid was a Greek mathematician who made important contributions to geometry and number theory. One famous result connected with his name is <strong>Euclid’s Division Lemma</strong>.</p>
+<p>The word <strong>lemma</strong> means a proven statement that is used to prove another mathematical result.</p>
+<p>Euclid’s Division Lemma is a very important concept in Class 9 because it forms the base for understanding:</p>
+<ul>
+<li>Division of integers</li>
+<li>Remainder concept</li>
+<li>Even and odd numbers</li>
+<li>Number forms such as $3q$, $3q+1$, $3q+2$</li>
+<li>HCF using Euclid’s Division Algorithm</li>
+</ul>
+<hr />
+<h1>2. Statement of Euclid’s Division Lemma</h1>
+<p>For any two positive integers $a$ and $b$, there exist unique integers $q$ and $r$ such that:</p>
+<p>$$
+a = bq + r
+$$</p>
+<p>where:</p>
+<p>$$
+0 \leq r &lt; b
+$$</p>
+<p>Here:</p>
+<table class="edu-table">
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$a$</td>
+<td>Dividend, the number being divided</td>
+</tr>
+<tr>
+<td>$b$</td>
+<td>Divisor, the number by which we divide</td>
+</tr>
+<tr>
+<td>$q$</td>
+<td>Quotient</td>
+</tr>
+<tr>
+<td>$r$</td>
+<td>Remainder</td>
+</tr>
+</tbody>
+</table>
+<p>In simple words:</p>
+<p>$$
+\text{Dividend} = \text{Divisor} \times \text{Quotient} + \text{Remainder}
+$$</p>
+<hr />
+<h1>3. Basic Level Understanding</h1>
+<h2>3.1 Meaning of division</h2>
+<p>Division means splitting a number into equal groups.</p>
+<p>Example:</p>
+<p>You have 25 chocolates and 7 students.</p>
+<p>Each student can get 3 chocolates.</p>
+<p>$$
+7 \times 3 = 21
+$$</p>
+<p>Remaining chocolates:</p>
+<p>$$
+25 - 21 = 4
+$$</p>
+<p>So:</p>
+<p>$$
+25 = 7 \times 3 + 4
+$$</p>
+<p>Here:</p>
+<table class="edu-table">
+<thead>
+<tr>
+<th>Term</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dividend</td>
+<td>25</td>
+</tr>
+<tr>
+<td>Divisor</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Quotient</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Remainder</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>This is Euclid’s Division Lemma.</p>
+<hr />
+<h2>3.2 Example from the textbook: Dividing 58 by 9</h2>
+<p>When 58 is divided by 9:</p>
+<p>$$
+58 = 9 \times 6 + 4
+$$</p>
+<p>Here:</p>
+<table class="edu-table">
+<thead>
+<tr>
+<th>Term</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$a$</td>
+<td>58</td>
+</tr>
+<tr>
+<td>$b$</td>
+<td>9</td>
+</tr>
+<tr>
+<td>$q$</td>
+<td>6</td>
+</tr>
+<tr>
+<td>$r$</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>Check the condition:</p>
+<p>$$
+0 \leq r &lt; b
+$$</p>
+<p>$$
+0 \leq 4 &lt; 9
+$$</p>
+<p>So the division form is correct.</p>
+<hr />
+<h1>4. Why should the remainder be less than the divisor?</h1>
+<p>The condition:</p>
+<p>$$
+0 \leq r &lt; b
+$$</p>
+<p>is very important.</p>
+<p>It means:</p>
+<ol>
+<li>The remainder should be zero or positive.</li>
+<li>The remainder should be smaller than the divisor.</li>
+</ol>
+<p>Example:</p>
+<p>$$
+25 = 7 \times 3 + 4
+$$</p>
+<p>Here the divisor is 7 and the remainder is 4.</p>
+<p>$$
+4 &lt; 7
+$$</p>
+<p>So this is correct.</p>
+<p>But suppose we write:</p>
+<p>$$
+25 = 7 \times 2 + 11
+$$</p>
+<p>This is mathematically equal because:</p>
+<p>$$
+7 \times 2 + 11 = 14 + 11 = 25
+$$</p>
+<p>But this is <strong>not the correct Euclid division form</strong>, because the remainder is 11.</p>
+<p>$$
+11 &gt; 7
+$$</p>
+<p>The remainder should not be greater than or equal to the divisor. If 11 is left, we can still divide it by 7 one more time. So the correct form is:</p>
+<p>$$
+25 = 7 \times 3 + 4
+$$</p>
+<hr />
+<h1>5. Important textbook examples</h1>
+<table class="edu-table">
+<thead>
+<tr>
+<th>Pair of integers</th>
+<th>Euclid division form</th>
+<th style="text-align: right;">Quotient</th>
+<th style="text-align: right;">Remainder</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>25, 7</td>
+<td>(25 = 7 \times 3 + 4)</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr>
+<td>20, 3</td>
+<td>(20 = 3 \times 6 + 2)</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td>7, 15</td>
+<td>(7 = 15 \times 0 + 7)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr>
+<td>35, 5</td>
+<td>(35 = 5 \times 7 + 0)</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>5.1 Case 1: Remainder is zero</h2>
+<p>If one number is exactly divisible by another, the remainder is zero.</p>
+<p>Example:</p>
+<p>$$
+35 = 5 \times 7 + 0
+$$</p>
+<p>Here:</p>
+<p>$$
+q = 7,\quad r = 0
+$$</p>
+<p>Check:</p>
+<p>$$
+0 \leq 0 &lt; 5
+$$</p>
+<p>So this is correct.</p>
+<hr />
+<h2>5.2 Case 2: Divisor is greater than dividend</h2>
+<p>Example:</p>
+<p>$$
+7 = 15 \times 0 + 7
+$$</p>
+<p>Here, 15 cannot go into 7 even once.</p>
+<p>So:</p>
+<p>$$
+q = 0,\quad r = 7
+$$</p>
+<p>Check:</p>
+<p>$$
+0 \leq 7 &lt; 15
+$$</p>
+<p>So Euclid’s Division Lemma works even when the divisor is greater than the dividend.</p>
+<hr />
+<h1>6. Real-life understanding</h1>
+<h2>6.1 Chocolate sharing example</h2>
+<p>Suppose you have 58 chocolates and 9 students.</p>
+<p>Each student can get 6 chocolates.</p>
+<p>$$
+9 \times 6 = 54
+$$</p>
+<p>Remaining chocolates:</p>
+<p>$$
+58 - 54 = 4
+$$</p>
+<p>So:</p>
+<p>$$
+58 = 9 \times 6 + 4
+$$</p>
+<table class="edu-table">
+<thead>
+<tr>
+<th>Situation</th>
+<th>Mathematical term</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Total chocolates</td>
+<td>Dividend</td>
+</tr>
+<tr>
+<td>Number of students</td>
+<td>Divisor</td>
+</tr>
+<tr>
+<td>Chocolates each student gets</td>
+<td>Quotient</td>
+</tr>
+<tr>
+<td>Chocolates left</td>
+<td>Remainder</td>
+</tr>
+</tbody>
+</table>
+<p>So Euclid’s Division Lemma is simply the mathematical form of equal sharing.</p>
+<hr />
+<h2>6.2 Bus seating example</h2>
+<p>Suppose 47 students are going on a trip. Each bus can carry 10 students.</p>
+<p>Number of full buses:</p>
+<p>$$
+10 \times 4 = 40
+$$</p>
+<p>Remaining students:</p>
+<p>$$
+47 - 40 = 7
+$$</p>
+<p>So:</p>
+<p>$$
+47 = 10 \times 4 + 7
+$$</p>
+<p>Here:</p>
+<table class="edu-table">
+<thead>
+<tr>
+<th>Term</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dividend</td>
+<td>47 students</td>
+</tr>
+<tr>
+<td>Divisor</td>
+<td>10 seats per bus</td>
+</tr>
+<tr>
+<td>Quotient</td>
+<td>4 full buses</td>
+</tr>
+<tr>
+<td>Remainder</td>
+<td>7 students left</td>
+</tr>
+</tbody>
+</table>
+<p>In real life, one extra bus may be needed for the remaining 7 students, but mathematically the Euclid division form is:</p>
+<p>$$
+47 = 10 \times 4 + 7
+$$</p>
+<hr />
+<h2>6.3 Packing apples example</h2>
+<p>A shopkeeper has 83 apples. He packs them in boxes of 12 apples each.</p>
+<p>$$
+12 \times 6 = 72
+$$</p>
+<p>Remaining apples:</p>
+<p>$$
+83 - 72 = 11
+$$</p>
+<p>So:</p>
+<p>$$
+83 = 12 \times 6 + 11
+$$</p>
+<p>Check:</p>
+<p>$$
+0 \leq 11 &lt; 12
+$$</p>
+<p>So the division form is correct.</p>
+<hr />
+<h1>7. Intermediate Level Understanding</h1>
+<h2>7.1 Possible remainders</h2>
+<p>When a number is divided by $b$, possible remainders are:</p>
+<p>$$
+0, 1, 2, 3, \ldots, b-1
+$$</p>
+<p>That means the remainder can start from 0, but it must stop one number before the divisor.</p>
+<hr />
+<h2>7.2 Possible remainders when divided by 2</h2>
+<p>When a number is divided by 2, possible remainders are:</p>
+<p>$$
+0, 1
+$$</p>
+<p>So every positive integer can be written as:</p>
+<p>$$
+2q
+$$</p>
+<p>or</p>
+<p>$$
+2q + 1
+$$</p>
+<p>If the remainder is 0, the number is even.</p>
+<p>$$
+a = 2q
+$$</p>
+<p>If the remainder is 1, the number is odd.</p>
+<p>$$
+a = 2q + 1
+$$</p>
+<p>Examples:</p>
+<table class="edu-table">
+<thead>
+<tr>
+<th style="text-align: right;">Number</th>
+<th>Form</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">8</td>
+<td>$2 \times 4 + 0$</td>
+<td>Even</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>$2 \times 4 + 1$</td>
+<td>Odd</td>
+</tr>
+<tr>
+<td style="text-align: right;">14</td>
+<td>$2 \times 7 + 0$</td>
+<td>Even</td>
+</tr>
+<tr>
+<td style="text-align: right;">15</td>
+<td>$2 \times 7 + 1$</td>
+<td>Odd</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>7.3 Possible remainders when divided by 3</h2>
+<p>When a number is divided by 3, possible remainders are:</p>
+<p>$$
+0, 1, 2
+$$</p>
+<p>So any positive integer can be written as:</p>
+<p>$$
+3q,\quad 3q+1,\quad 3q+2
+$$</p>
+<p>Examples:</p>
+<table class="edu-table">
+<thead>
+<tr>
+<th style="text-align: right;">Number</th>
+<th>Euclid form</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">12</td>
+<td>$3 \times 4 + 0 = 3q$</td>
+</tr>
+<tr>
+<td style="text-align: right;">13</td>
+<td>$3 \times 4 + 1 = 3q+1$</td>
+</tr>
+<tr>
+<td style="text-align: right;">14</td>
+<td>$3 \times 4 + 2 = 3q+2$</td>
+</tr>
+<tr>
+<td style="text-align: right;">15</td>
+<td>$3 \times 5 + 0 = 3q$</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>7.4 Possible remainders when divided by 4</h2>
+<p>When a number is divided by 4, possible remainders are:</p>
+<p>$$
+0, 1, 2, 3
+$$</p>
+<p>So any positive integer can be written as:</p>
+<p>$$
+4q,\quad 4q+1,\quad 4q+2,\quad 4q+3
+$$</p>
+<p>Examples:</p>
+<table class="edu-table">
+<thead>
+<tr>
+<th style="text-align: right;">Number</th>
+<th>Euclid form</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">20</td>
+<td>$4 \times 5 + 0$</td>
+</tr>
+<tr>
+<td style="text-align: right;">21</td>
+<td>$4 \times 5 + 1$</td>
+</tr>
+<tr>
+<td style="text-align: right;">22</td>
+<td>$4 \times 5 + 2$</td>
+</tr>
+<tr>
+<td style="text-align: right;">23</td>
+<td>$4 \times 5 + 3$</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>8. Advanced Level Understanding</h1>
+<h2>8.1 Meaning of uniqueness</h2>
+<p>Euclid’s Division Lemma says that $q$ and $r$ are unique.</p>
+<p>Unique means that for a fixed $a$ and $b$, there is only one correct quotient and one correct remainder satisfying:</p>
+<p>$$
+a = bq + r
+$$</p>
+<p>where:</p>
+<p>$$
+0 \leq r &lt; b
+$$</p>
+<p>Example:</p>
+<p>$$
+58 = 9 \times 6 + 4
+$$</p>
+<p>Can we write?</p>
+<p>$$
+58 = 9 \times 5 + 13
+$$</p>
+<p>Numerically:</p>
+<p>$$
+9 \times 5 + 13 = 45 + 13 = 58
+$$</p>
+<p>But this is not valid because:</p>
+<p>$$
+13 &gt; 9
+$$</p>
+<p>Can we write?</p>
+<p>$$
+58 = 9 \times 7 - 5
+$$</p>
+<p>Numerically:</p>
+<p>$$
+63 - 5 = 58
+$$</p>
+<p>But this is not valid because the remainder cannot be negative.</p>
+<p>So only this form is valid:</p>
+<p>$$
+58 = 9 \times 6 + 4
+$$</p>
+<p>Therefore, quotient and remainder are unique.</p>
+<hr />
+<h2>8.2 Proof idea of uniqueness</h2>
+<p>Suppose there are two different representations:</p>
+<p>$$
+a = bq + r
+$$</p>
+<p>and:</p>
+<p>$$
+a = bs + t
+$$</p>
+<p>where:</p>
+<p>$$
+0 \leq r &lt; b
+$$</p>
+<p>and:</p>
+<p>$$
+0 \leq t &lt; b
+$$</p>
+<p>Since both are equal to $a$:</p>
+<p>$$
+bq + r = bs + t
+$$</p>
+<p>Rearranging:</p>
+<p>$$
+r - t = bs - bq
+$$</p>
+<p>$$
+r - t = b(s-q)
+$$</p>
+<p>This means $r-t$ is a multiple of $b$.</p>
+<p>But both $r$ and (t) are smaller than $b$. So the difference between $r$ and (t) must be less than $b$.</p>
+<p>The only multiple of $b$ between (-b) and $b$ is 0.</p>
+<p>Therefore:</p>
+<p>$$
+r - t = 0
+$$</p>
+<p>So:</p>
+<p>$$
+r = t
+$$</p>
+<p>Then:</p>
+<p>$$
+bq = bs
+$$</p>
+<p>So:</p>
+<p>$$
+q = s
+$$</p>
+<p>Therefore, quotient and remainder are unique.</p>
+<hr />
+<h2>8.3 Euclid’s Division Lemma and arithmetic progression</h2>
+<p>In the textbook proof, we consider the multiples of $b$:</p>
+<p>$$
+\ldots, -3b, -2b, -b, 0, b, 2b, 3b, \ldots
+$$</p>
+<p>These numbers form an arithmetic progression with common difference $b$.</p>
+<p>For any positive integer $a$, we find the largest multiple of $b$ that is less than or equal to $a$.</p>
+<p>That multiple is:</p>
+<p>$$
+bq
+$$</p>
+<p>Then the remaining part is:</p>
+<p>$$
+r = a - bq
+$$</p>
+<p>So:</p>
+<p>$$
+a = bq + r
+$$</p>
+<p>Since $bq$ is the largest multiple of $b$ not exceeding $a$, the remainder $r$ must be smaller than $b$.</p>
+<p>Therefore:</p>
+<p>$$
+0 \leq r &lt; b
+$$</p>
+<hr />
+<h1>9. Advanced Applications</h1>
+<h2>9.1 Proving the square of every odd integer is of the form $4q+1$</h2>
+<p>Any odd integer can be written as:</p>
+<p>$$
+2m + 1
+$$</p>
+<p>Now square it:</p>
+<p>$$
+(2m+1)^2
+$$</p>
+<p>$$
+= 4m^2 + 4m + 1
+$$</p>
+<p>$$
+= 4(m^2+m) + 1
+$$</p>
+<p>Let:</p>
+<p>$$
+q = m^2 + m
+$$</p>
+<p>Therefore:</p>
+<p>$$
+(2m+1)^2 = 4q + 1
+$$</p>
+<p>Hence, the square of every odd integer is of the form:</p>
+<p>$$
+4q + 1
+$$</p>
+<hr />
+<h2>9.2 Proving the square of any integer is of the form $3q$ or $3q+1$</h2>
+<p>Let $a$ be any positive integer.</p>
+<p>By Euclid’s Division Lemma, when $a$ is divided by 3:</p>
+<p>$$
+a = 3q + r
+$$</p>
+<p>where:</p>
+<p>$$
+r = 0, 1, 2
+$$</p>
+<h3>Case 1: (a = 3q)</h3>
+<p>$$
+a^2 = $3q$^2 = 9q^2
+$$</p>
+<p>$$
+a^2 = 3(3q^2)
+$$</p>
+<p>So $a^2$ is of the form $3q$.</p>
+<hr />
+<h3>Case 2: (a = 3q+1)</h3>
+<p>$$
+a^2 = $3q+1$^2
+$$</p>
+<p>$$
+= 9q^2 + 6q + 1
+$$</p>
+<p>$$
+= 3(3q^2 + 2q) + 1
+$$</p>
+<p>So $a^2$ is of the form $3q+1$.</p>
+<hr />
+<h3>Case 3: (a = 3q+2)</h3>
+<p>$$
+a^2 = $3q+2$^2
+$$</p>
+<p>$$
+= 9q^2 + 12q + 4
+$$</p>
+<p>$$
+= 9q^2 + 12q + 3 + 1
+$$</p>
+<p>$$
+= 3(3q^2 + 4q + 1) + 1
+$$</p>
+<p>So $a^2$ is also of the form $3q+1$.</p>
+<p>Therefore, the square of any positive integer is of the form:</p>
+<p>$$
+3q
+$$</p>
+<p>or:</p>
+<p>$$
+3q+1
+$$</p>
+<hr />
+<h2>9.3 Finding HCF using Euclid’s Division Algorithm</h2>
+<p>Euclid’s Division Lemma is used to find HCF.</p>
+<h3>Example: Find HCF of 135 and 225</h3>
+<p>Take the bigger number first.</p>
+<p>$$
+225 = 135 \times 1 + 90
+$$</p>
+<p>Now divide 135 by 90:</p>
+<p>$$
+135 = 90 \times 1 + 45
+$$</p>
+<p>Now divide 90 by 45:</p>
+<p>$$
+90 = 45 \times 2 + 0
+$$</p>
+<p>When the remainder becomes 0, the divisor at that step is the HCF.</p>
+<p>So:</p>
+<p>$$
+\text{HCF} = 45
+$$</p>
+<hr />
+<h1>10. Common mistakes students make</h1>
+<h2>Mistake 1: Taking remainder greater than divisor</h2>
+<p>Wrong:</p>
+<p>$$
+30 = 7 \times 3 + 9
+$$</p>
+<p>Here remainder is 9 and divisor is 7.</p>
+<p>$$
+9 &gt; 7
+$$</p>
+<p>So it is wrong.</p>
+<p>Correct:</p>
+<p>$$
+30 = 7 \times 4 + 2
+$$</p>
+<hr />
+<h2>Mistake 2: Taking negative remainder</h2>
+<p>Wrong:</p>
+<p>$$
+30 = 7 \times 5 - 5
+$$</p>
+<p>Remainder cannot be negative.</p>
+<p>Correct:</p>
+<p>$$
+30 = 7 \times 4 + 2
+$$</p>
+<hr />
+<h2>Mistake 3: Confusing $a$ and $b$</h2>
+<p>If the question says, “Apply Euclid’s Division Lemma to 47 and 6,” usually:</p>
+<p>$$
+a = 47,\quad b = 6
+$$</p>
+<p>So:</p>
+<p>$$
+47 = 6 \times 7 + 5
+$$</p>
+<p>Do not write:</p>
+<p>$$
+6 = 47 \times 0 + 6
+$$</p>
+<p>unless the question specifically asks to divide 6 by 47.</p>
+<hr />
+<h1>11. List of important concepts</h1>
+<table class="edu-table">
+<thead>
+<tr>
+<th style="text-align: right;">No.</th>
+<th>Concept</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Euclid</td>
+<td>Greek mathematician</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>Lemma</td>
+<td>Proven statement used to prove another result</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>Division Lemma</td>
+<td>Rule for expressing division</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>Positive integers</td>
+<td>Numbers like 1, 2, 3, 4, ...</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>Non-negative integers</td>
+<td>Numbers like 0, 1, 2, 3, ...</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>Dividend</td>
+<td>Number being divided</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>Divisor</td>
+<td>Number by which we divide</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td>Quotient</td>
+<td>Number of times divisor fits into dividend</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>Remainder</td>
+<td>Leftover value after division</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td>Remainder condition</td>
+<td>$0 \leq r &lt; b$</td>
+</tr>
+<tr>
+<td style="text-align: right;">11</td>
+<td>Unique quotient</td>
+<td>Only one valid quotient</td>
+</tr>
+<tr>
+<td style="text-align: right;">12</td>
+<td>Unique remainder</td>
+<td>Only one valid remainder</td>
+</tr>
+<tr>
+<td style="text-align: right;">13</td>
+<td>Multiples of $b$</td>
+<td>$0, b, 2b, 3b, \ldots$</td>
+</tr>
+<tr>
+<td style="text-align: right;">14</td>
+<td>Arithmetic progression</td>
+<td>Multiples of $b$ form an AP</td>
+</tr>
+<tr>
+<td style="text-align: right;">15</td>
+<td>Division Algorithm</td>
+<td>Application of division lemma to find HCF</td>
+</tr>
+<tr>
+<td style="text-align: right;">16</td>
+<td>Even number form</td>
+<td>$2q$</td>
+</tr>
+<tr>
+<td style="text-align: right;">17</td>
+<td>Odd number form</td>
+<td>$2q+1$</td>
+</tr>
+<tr>
+<td style="text-align: right;">18</td>
+<td>Remainder cases</td>
+<td>Based on divisor</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>12. Basic, Intermediate, and Advanced Summary</h1>
+<table class="edu-table">
+<thead>
+<tr>
+<th>Level</th>
+<th>Student should understand</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic</td>
+<td>Dividend, divisor, quotient, remainder</td>
+<td>(25 = 7 \times 3 + 4)</td>
+</tr>
+<tr>
+<td>Basic</td>
+<td>Remainder should be less than divisor</td>
+<td>$0 \leq 4 &lt; 7$</td>
+</tr>
+<tr>
+<td>Intermediate</td>
+<td>Possible remainders</td>
+<td>Dividing by 5 gives (0,1,2,3,4)</td>
+</tr>
+<tr>
+<td>Intermediate</td>
+<td>Even and odd forms</td>
+<td>$2q$, $2q+1$</td>
+</tr>
+<tr>
+<td>Intermediate</td>
+<td>Number forms</td>
+<td>$3q$, $3q+1$, $3q+2$</td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td>Uniqueness of quotient and remainder</td>
+<td>Only one valid $q$ and $r$</td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td>Proof-based questions</td>
+<td>Square forms</td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td>HCF by Euclid’s algorithm</td>
+<td>HCF of 225 and 135 is 45</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>13. Textbook-type problems</h1>
+<h2>Type 1: Write in Euclid form</h2>
+<p>Write each in the form:</p>
+<p>$$
+a = bq + r
+$$</p>
+<table class="edu-table">
+<thead>
+<tr>
+<th>Problem</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Divide 58 by 9</td>
+<td>(58 = 9 \times 6 + 4)</td>
+</tr>
+<tr>
+<td>Divide 25 by 7</td>
+<td>(25 = 7 \times 3 + 4)</td>
+</tr>
+<tr>
+<td>Divide 20 by 3</td>
+<td>(20 = 3 \times 6 + 2)</td>
+</tr>
+<tr>
+<td>Divide 35 by 5</td>
+<td>(35 = 5 \times 7 + 0)</td>
+</tr>
+<tr>
+<td>Divide 7 by 15</td>
+<td>(7 = 15 \times 0 + 7)</td>
+</tr>
+<tr>
+<td>Divide 47 by 6</td>
+<td>(47 = 6 \times 7 + 5)</td>
+</tr>
+<tr>
+<td>Divide 81 by 9</td>
+<td>(81 = 9 \times 9 + 0)</td>
+</tr>
+<tr>
+<td>Divide 100 by 13</td>
+<td>(100 = 13 \times 7 + 9)</td>
+</tr>
+<tr>
+<td>Divide 5 by 12</td>
+<td>(5 = 12 \times 0 + 5)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Type 2: Find quotient and remainder</h2>
+<h3>Problem 1</h3>
+<p>Find quotient and remainder when 103 is divided by 8.</p>
+<p>$$
+103 = 8 \times 12 + 7
+$$</p>
+<p>So:</p>
+<p>$$
+q = 12,\quad r = 7
+$$</p>
+<hr />
+<h3>Problem 2</h3>
+<p>Find quotient and remainder when 75 is divided by 12.</p>
+<p>$$
+75 = 12 \times 6 + 3
+$$</p>
+<p>So:</p>
+<p>$$
+q = 6,\quad r = 3
+$$</p>
+<hr />
+<h3>Problem 3</h3>
+<p>Find quotient and remainder when 135 is divided by 11.</p>
+<p>$$
+135 = 11 \times 12 + 3
+$$</p>
+<p>So:</p>
+<p>$$
+q = 12,\quad r = 3
+$$</p>
+<hr />
+<h2>Type 3: Check whether the expression is valid</h2>
+<h3>Problem</h3>
+<p>Is this valid?</p>
+<p>$$
+41 = 6 \times 5 + 11
+$$</p>
+<p>Check:</p>
+<p>$$
+6 \times 5 + 11 = 30 + 11 = 41
+$$</p>
+<p>But the remainder is 11 and the divisor is 6.</p>
+<p>$$
+11 &gt; 6
+$$</p>
+<p>So it is not valid in Euclid’s Division Lemma.</p>
+<p>Correct form:</p>
+<p>$$
+41 = 6 \times 6 + 5
+$$</p>
+<hr />
+<h2>Type 4: Find possible remainders</h2>
+<h3>Problem 1</h3>
+<p>What are the possible remainders when a number is divided by 5?</p>
+<p>Possible remainders are:</p>
+<p>$$
+0, 1, 2, 3, 4
+$$</p>
+<hr />
+<h3>Problem 2</h3>
+<p>What are the possible remainders when a number is divided by 6?</p>
+<p>Possible remainders are:</p>
+<p>$$
+0, 1, 2, 3, 4, 5
+$$</p>
+<hr />
+<h3>Problem 3</h3>
+<p>What are the possible remainders when a number is divided by 7?</p>
+<p>Possible remainders are:</p>
+<p>$$
+0, 1, 2, 3, 4, 5, 6
+$$</p>
+<hr />
+<h2>Type 5: Express integers in different forms</h2>
+<h3>Problem</h3>
+<p>Using Euclid’s Division Lemma, show that every positive integer is of the form:</p>
+<p>$$
+3q,\quad 3q+1,\quad 3q+2
+$$</p>
+<p>Solution:</p>
+<p>Let $a$ be any positive integer.</p>
+<p>Divide $a$ by 3.</p>
+<p>By Euclid’s Division Lemma:</p>
+<p>$$
+a = 3q + r
+$$</p>
+<p>where:</p>
+<p>$$
+0 \leq r &lt; 3
+$$</p>
+<p>So possible values of $r$ are:</p>
+<p>$$
+0, 1, 2
+$$</p>
+<p>If (r = 0):</p>
+<p>$$
+a = 3q
+$$</p>
+<p>If (r = 1):</p>
+<p>$$
+a = 3q + 1
+$$</p>
+<p>If (r = 2):</p>
+<p>$$
+a = 3q + 2
+$$</p>
+<p>Therefore, every positive integer is of the form:</p>
+<p>$$
+3q,\quad 3q+1,\quad 3q+2
+$$</p>
+<hr />
+<h1>14. Practice problems with answers</h1>
+<table class="edu-table">
+<thead>
+<tr>
+<th style="text-align: right;">No.</th>
+<th>Question</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Divide 64 by 7</td>
+<td>(64 = 7 \times 9 + 1)</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>Divide 90 by 11</td>
+<td>(90 = 11 \times 8 + 2)</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>Divide 121 by 10</td>
+<td>(121 = 10 \times 12 + 1)</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>Divide 45 by 6</td>
+<td>(45 = 6 \times 7 + 3)</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>Divide 100 by 9</td>
+<td>(100 = 9 \times 11 + 1)</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>Divide 18 by 25</td>
+<td>(18 = 25 \times 0 + 18)</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>Divide 72 by 8</td>
+<td>(72 = 8 \times 9 + 0)</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td>Divide 56 by 5</td>
+<td>(56 = 5 \times 11 + 1)</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>Divide 99 by 4</td>
+<td>(99 = 4 \times 24 + 3)</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td>Divide 150 by 13</td>
+<td>(150 = 13 \times 11 + 7)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>15. Exam-ready answers</h1>
+<h2>Question 1: State Euclid’s Division Lemma.</h2>
+<p>Euclid’s Division Lemma states that for any two positive integers $a$ and $b$, there exist unique integers $q$ and $r$ such that:</p>
+<p>$$
+a = bq + r
+$$</p>
+<p>where:</p>
+<p>$$
+0 \leq r &lt; b
+$$</p>
+<p>Here, $q$ is the quotient and $r$ is the remainder.</p>
+<hr />
+<h2>Question 2: Apply Euclid’s Division Lemma to 58 and 9.</h2>
+<p>$$
+58 = 9 \times 6 + 4
+$$</p>
+<p>So:</p>
+<p>$$
+q = 6,\quad r = 4
+$$</p>
+<p>Since:</p>
+<p>$$
+0 \leq 4 &lt; 9
+$$</p>
+<p>the division form is valid.</p>
+<hr />
+<h2>Question 3: What are the possible remainders when divided by 5?</h2>
+<p>When a number is divided by 5, the remainder must be less than 5.</p>
+<p>So the possible remainders are:</p>
+<p>$$
+0, 1, 2, 3, 4
+$$</p>
+<hr />
+<h2>Question 4: Why is (58 = 9 \times 5 + 13) not valid according to Euclid’s Division Lemma?</h2>
+<p>Although:</p>
+<p>$$
+9 \times 5 + 13 = 58
+$$</p>
+<p>it is not valid because the remainder is 13.</p>
+<p>Here the divisor is 9.</p>
+<p>$$
+13 &gt; 9
+$$</p>
+<p>But the remainder must be smaller than the divisor.</p>
+<p>Correct form:</p>
+<p>$$
+58 = 9 \times 6 + 4
+$$</p>
+<hr />
+<h1>16. Memory trick</h1>
+<p>Remember:</p>
+<p>$$
+a = bq + r
+$$</p>
+<p>as:</p>
+<p><strong>A Big Queen Rested</strong></p>
+<table class="edu-table">
+<thead>
+<tr>
+<th>Letter</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>$a$</td>
+</tr>
+<tr>
+<td>Big</td>
+<td>$b$</td>
+</tr>
+<tr>
+<td>Queen</td>
+<td>$q$</td>
+</tr>
+<tr>
+<td>Rested</td>
+<td>$r$</td>
+</tr>
+</tbody>
+</table>
+<p>So:</p>
+<p>$$
+a = bq + r
+$$</p>
+<hr />
+<h1>17. One-line formula to remember</h1>
+<p>$$
+\boxed{\text{Dividend} = \text{Divisor} \times \text{Quotient} + \text{Remainder}}
+$$</p>
+<p>or</p>
+<p>$$
+\boxed{a = bq + r,\quad 0 \leq r &lt; b}
+$$</p>
+<hr />
+<h1>18. Tamil-English quick understanding</h1>
+<p>Euclid’s Division Lemma means:</p>
+<p><strong>Oru positive integer-ai innoru positive integer-aal divide pannumbothu, adhai always indha form-la ezhutha mudiyum:</strong></p>
+<p>$$
+a = bq + r
+$$</p>
+<p><strong>Inga $r$, yani remainder, always divisor $b$-vida chinna number-a irukkanum.</strong></p>
+<p>Example:</p>
+<p>$$
+58 = 9 \times 6 + 4
+$$</p>
+<p>Meaning:</p>
+<p>9 goes into 58 six times, and 4 is balance.</p>
+<p>So:</p>
+<p>$$
+q = 6,\quad r = 4
+$$</p>
+<p>Main rule:</p>
+<p>$$
+0 \leq r &lt; b
+$$</p>
+<hr />
+<h1>19. Final key takeaway</h1>
+<p>Euclid’s Division Lemma tells us that whenever we divide one positive integer by another positive integer, we can always write it in the form:</p>
+<p>$$
+a = bq + r
+$$</p>
+<p>where the remainder is always greater than or equal to zero and smaller than the divisor.</p>
+<p>This simple rule is the foundation for many important ideas in number theory, especially <strong>Euclid’s Division Algorithm for finding HCF</strong>.</p>
+    </main>
+
+    <footer class="footer">
+      Euclid’s Division Lemma — Class 9 CBSE Mathematics | Printable webpage
+    </footer>
+  </article>
+</body>
+</html>
